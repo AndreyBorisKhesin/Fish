@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import fish.Event;
 import fish.Team;
@@ -32,11 +33,25 @@ public class GameController {
 	 */
 	private List<PlayerContainer> players;
 
-	public void startGame(List<PlayerInterface> inters) {
+	/**
+	 * The queue of input messages received from clients
+	 */
+	private ConcurrentLinkedQueue<ServerMessage> sq;
+
+	/**
+	 * Begins the game with the given players
+	 * 
+	 * @param inters The interfaces with which to communicate with the
+	 * players
+	 */
+	public void startGame(List<PlayerInterface> inters,
+			ConcurrentLinkedQueue<ServerMessage> sq) {
 		if (!Util.validPlayerNum(inters.size()))
 			throw new IllegalArgumentException(
 					"Invalid number of players: "
 							+ inters.size());
+		this.sq = sq;
+
 		List<Team> teams = new ArrayList<Team>();
 		for (int i = 0; i < inters.size(); i++) {
 			teams.add(i < inters.size() / 2 ? Team.BLK : Team.RED);
