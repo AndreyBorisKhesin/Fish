@@ -2,7 +2,8 @@ package fish.server;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import fish.Question;
+import fish.events.Question;
+import fish.server.playermessages.PlayerMessage;
 
 /**
  * An interface to define interactions between the player and server.

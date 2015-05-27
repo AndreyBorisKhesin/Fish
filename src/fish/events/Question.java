@@ -1,19 +1,21 @@
-package fish;
+package fish.events;
+
+import fish.Card;
 
 /**
  * A data object representing a query from one player to another.
  */
-public class Question implements Event {
+public class Question extends Event {
 
 	/**
 	 * The person asking the question.
 	 */
-	final int source;//FIXME change int to Player
+	final int source;
 
 	/**
 	 * The person being asked.
 	 */
-	final int dest;//FIXME change int to Player
+	final int dest;
 
 	/**
 	 * The card being asked for.
@@ -27,7 +29,7 @@ public class Question implements Event {
 	 * @param dest The player being asked.
 	 * @param c The card being asked for.
 	 */
-	public Question(int source, int dest, Card c) {//FIXME change int to Player
+	public Question(int source, int dest, Card c) {
 		this.source = source;
 		this.dest = dest;
 		this.c = c;

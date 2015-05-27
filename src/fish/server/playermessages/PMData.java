@@ -1,4 +1,5 @@
-package fish.server;
+package fish.server.playermessages;
+
 
 /**
  * A data object to be sent in a message.

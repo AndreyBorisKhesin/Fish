@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import fish.Event;
 import fish.Team;
 import fish.Util;
+import fish.events.Event;
 
 /**
  * The object controlling the game flow. It shall communicate with player
@@ -17,7 +17,7 @@ import fish.Util;
  */
 public class GameController {
 	/**
-	 * A list of events that have occurred this far into the game, such as
+	 * A list of fish.events that have occurred this far into the game, such as
 	 * question asked and declarations
 	 */
 	private List<Event> events;
