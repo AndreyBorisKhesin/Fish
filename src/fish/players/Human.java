@@ -1,7 +1,8 @@
 package fish.players;
 
 /**
- * Created by Andrey on 2015-05-27.
+ * A Player who is controlled by a Human.
  */
-public class Human {
+public class Human implements Player {
+
 }

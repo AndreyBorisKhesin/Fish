@@ -1,7 +1,10 @@
 package fish.players;
 
+import fish.Hand;
+
 /**
- * Created by Andrey on 2015-05-27.
+ * An interface for all Humans and AI's playing the game.
  */
 public interface Player {
+
 }

@@ -18,7 +18,7 @@ public class Hand {
 	public Hand() {
 		hand = new Set[8];
 		for (int i = 0; i < 8; i++) {
-			hand[i] = new HashSet();
+			hand[i] = new HashSet<>();
 		}
 	}
 
@@ -55,9 +55,9 @@ public class Hand {
 	 * 
 	 * @return A set containing all cards in the hand.
 	 */
-	public Set getCards() {
-		Set cards = new HashSet();
-		for (Set s : hand) {
+	public Set<Card> getCards() {
+		Set<Card> cards = new HashSet<>();
+		for (Set<Card> s : hand) {
 			cards.addAll(s);
 		}
 		return cards;
