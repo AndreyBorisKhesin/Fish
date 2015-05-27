@@ -45,11 +45,11 @@ public class Card {
 		this.suit = suit;
 	}
 
+
 	/**
 	 * returns a hashcode uniquely representing this card in the form suit *
 	 * 6 + value
 	 */
-	@Override
 	public int hashCode() {
 		return suit * 6 + value;
 	}
