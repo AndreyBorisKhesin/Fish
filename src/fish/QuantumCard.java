@@ -1,7 +1,8 @@
 package fish;
 
 /**
- * Created by Andrey on 2015-05-27.
+ * A card containing a probability of being in a player's hand.
  */
-public class QuantumCard {
+public class QuantumCard extends Card {
+
 }

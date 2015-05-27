@@ -6,7 +6,7 @@ package fish;
 public class Card {
 
 	/**
-	 * Value of card:
+	 * Value of card from 0 to 5.
 	 * 0: 2 or 9
 	 * 1: 3 or T
 	 * 2: 4 or J
@@ -30,9 +30,9 @@ public class Card {
 	public final int suit;
 
 	/**
-	 * Constructor for Card class accepting value and suit
-	 * @param value Value of card
-	 * @param suit Suit of card
+	 * Card constructor accepting value and suit.
+	 * @param value Value of card.
+	 * @param suit Suit of card.
 	 */
 	public Card(int value, int suit) {
 		if (value < 0 || value > 5 || suit < 0 || suit > 7) {
