@@ -46,22 +46,20 @@ public class Card {
 	/**
 	 * Card constructor accepting hashcode.
 	 *
-	 * @param hashCode Hashcode for the card. Equal to suit * 6 + rank
+	 * @param hashCode Hashcode of card.
 	 */
 	public Card(int hashCode) {
-		this.suit = hashCode / 6;
-		this.rank = hashCode % 6;
+		this(hashCode / 6, hashCode % 6);
 	}
 
 	/**
-	 * Returns a hashcode uniquely representing the card in the form of suit *
-	 * 6 + rank.
+	 * Returns a clone of this card.
 	 *
-	 * @return Returns hashcode for the card.
+	 * @return A clone of the invoking card.
 	 */
 	@Override
-	public int hashCode() {
-		return suit * 6 + rank;
+	public Card clone() {
+		return new Card(this.hashCode());
 	}
 
 	/**
@@ -77,5 +75,16 @@ public class Card {
 		}
 		Card c = (Card) o;
 		return c.suit == suit && c.rank == rank;
+	}
+
+	/**
+	 * Returns a hashcode uniquely representing the card in the form of suit *
+	 * 6 + rank.
+	 *
+	 * @return Returns hashcode for the card.
+	 */
+	@Override
+	public int hashCode() {
+		return suit * 6 + rank;
 	}
 }
