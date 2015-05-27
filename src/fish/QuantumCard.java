@@ -43,4 +43,12 @@ public class QuantumCard extends Card {
 	public double getProb() {
 		return prob;
 	}
+
+	/**
+	 * Probability setter.
+	 * @param prob New probability value.
+	 */
+	public void setProb(double prob) {
+		this.prob = prob;
+	}
 }

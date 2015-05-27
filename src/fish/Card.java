@@ -67,7 +67,7 @@ public class Card {
 	 * Determines if two card objects are equivalent by suit and rank.
 	 *
 	 * @param o Card object for this to be compared to.
-	 * @return True if objects are equal.
+	 * @return True if cards are equal, false otherwise.
 	 */
 	@Override
 	public boolean equals(Object o) {
