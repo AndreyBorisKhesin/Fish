@@ -3,8 +3,7 @@ package fish;
 import java.awt.Color;
 
 /**
- * An enum for which team a player is on
- * 
+ * An enum for which team a player is on.
  */
 public enum Team {
 	RED, BLK;

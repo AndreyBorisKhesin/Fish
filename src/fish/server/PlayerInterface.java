@@ -6,17 +6,16 @@ import fish.Question;
 
 /**
  * An interface to define interactions between the player and server.
- * 
  */
 public abstract class PlayerInterface implements Runnable {
 
 	/**
-	 * The Thread on which this interface is running
+	 * The Thread on which this interface is running.
 	 */
 	protected Thread t;
 
 	/**
-	 * The message queue to deliver to the player
+	 * The message Queue to deliver to the Player.
 	 */
 	protected ConcurrentLinkedQueue<PlayerMessage> mqueue;
 
@@ -26,15 +25,14 @@ public abstract class PlayerInterface implements Runnable {
 	}
 
 	/**
-	 * Call at the end of subclass constructors
+	 * Call at the end of subclass constructors.
 	 */
 	protected void launch() {
 		t.start();
 	}
 
 	/**
-	 * Provides a game controller object for communication with the game.
-	 * state
+	 * Provides a game controller object for communication with the game state.
 	 * 
 	 * @param g The GameController object running the current game.
 	 */

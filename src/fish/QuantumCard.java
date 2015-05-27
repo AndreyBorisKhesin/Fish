@@ -1,21 +1,21 @@
 package fish;
 
 /**
- * A card containing a probability of being in a player's hand.
+ * A Card containing a probability of being in a Player's Hand.
  */
 public class QuantumCard extends Card {
 
 	/**
-	 * Probability of being in a given player's hand.
+	 * Probability of being in a given Player's Hand.
 	 */
 	private double prob;
 
 	/**
-	 * Quantum card constructor accepting suit, rank, and probability.
+	 * QuantumCard constructor accepting suit, rank, and probability.
 	 *
-	 * @param suit Suit of card.
-	 * @param rank Value of card.
-	 * @param prob Probability of this card of being in a player's hand.
+	 * @param suit Suit of Card.
+	 * @param rank Value of Card.
+	 * @param prob Probability of this Card of being in a Player's Hand.
 	 */
 	public QuantumCard(int suit, int rank, double prob) {
 		super(suit, rank);
@@ -26,10 +26,10 @@ public class QuantumCard extends Card {
 	}
 
 	/**
-	 * Quantum card constructor accepting hashcode and probability.
+	 * QuantumCard constructor accepting hashcode and probability.
 	 *
-	 * @param hashcode Hashcode of card.
-	 * @param prob Probability of this card of being in a player's hand.
+	 * @param hashcode Hashcode of Card.
+	 * @param prob Probability of this Card of being in a Player's Hand.
 	 */
 	public QuantumCard(int hashcode, double prob) {
 		this(hashcode / 6, hashcode % 6, prob);
@@ -38,9 +38,17 @@ public class QuantumCard extends Card {
 	/**
 	 * Probability getter.
 	 *
-	 * @return Probability of being in a player's hand.
+	 * @return Probability of being in a Player's Hand.
 	 */
 	public double getProb() {
 		return prob;
+	}
+
+	/**
+	 * Probability setter.
+	 * @param prob New probability value.
+	 */
+	public void setProb(double prob) {
+		this.prob = prob;
 	}
 }

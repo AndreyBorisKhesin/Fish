@@ -1,9 +1,7 @@
 package fish;
 
 /**
- * Represents a game event
- * 
+ * Represents a game event.
  */
 public interface Event {
-
 }

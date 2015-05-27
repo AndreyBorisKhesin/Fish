@@ -1,8 +1,7 @@
 package fish.server;
 
 /**
- * A message to send to a player
- * 
+ * A message to send to a player.
  */
 public class PlayerMessage {
 	/**
