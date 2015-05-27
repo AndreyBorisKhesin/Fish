@@ -1,3 +1,4 @@
+package fish;
 /**
  * A class that represents a card that holds a suit and a value.
  */
