@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A probabilistic hand containing a distribution of cards held by your
- * opponents based on the probabilities of them having those cards.
+ * A probabilistic Hand containing a distribution of Cards held by your
+ * opponents based on the probabilities of them having those Cards.
  */
 public class QuantumHand {
 
 	/**
-	 * Possible cards that could be in a player's hand and their probabilities.
+	 * Possible Cards that could be in a Player's Hand and their probabilities.
 	 * Elements 0 to 7 are specific suits.
 	 * Element 8 is the generic suit.
 	 */
@@ -19,8 +19,8 @@ public class QuantumHand {
 	private int[][] bounds = new int[2][9];
 
 	/**
-	 * Default quantum hand constructor.
-	 * It contains each card with equal probability.
+	 * Default QuantumHand constructor.
+	 * It contains each Card with equal probability.
 	 */
 	public QuantumHand() {
 		for (int i = 0; i < hand.length; i++) {

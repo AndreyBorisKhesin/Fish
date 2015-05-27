@@ -1,15 +1,15 @@
 package fish.server;
 
 /**
- * A message to send to a player
- * 
+ * A message to send to a player.
  */
 public class PlayerMessage {
 	/**
-	 * 0: game state
-	 * 1: question asked
-	 * 2: declaration started
-	 * 3: declaration ended
+	 * The type of message from 0 to 3.
+	 * 0: Game state.
+	 * 1: Question asked.
+	 * 2: Declaration started.
+	 * 3: Declaration ended.
 	 */
 	public final int type;
 

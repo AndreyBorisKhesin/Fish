@@ -1,7 +1,7 @@
 package fish.server;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import fish.Hand;
 import fish.Team;
@@ -9,18 +9,17 @@ import fish.Team;
 /**
  * Holds the set of information for one player including cards held, and suits
  * taken.
- * 
  */
 class PlayerState {
-	int idx;
-	Team t;
+	int id;
+	Team team;
 	Hand hand;
-	Set<Integer> tricks;
+	List tricks;
 
-	PlayerState(int idx, Team t) {
-		this.idx = idx;
-		this.t = t;
+	PlayerState(int id, Team team) {
+		this.id = id;
+		this.team = team;
 		hand = new Hand();
-		tricks = new HashSet<Integer>();
+		tricks = new ArrayList();
 	}
 }
