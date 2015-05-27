@@ -1,5 +1,6 @@
 package fish;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class Hand {
 	public Hand() {
 		hand = new Set[8];
 		for (int i = 0; i < 8; i++) {
-			hand[i] = new HashSet();
+			hand[i] = new HashSet<Card>();
 		}
 	}
 
@@ -55,11 +56,9 @@ public class Hand {
 	 * 
 	 * @return A set containing all cards in the hand.
 	 */
-	public Set getCards() {
-		Set cards = new HashSet();
-		for (Set s : hand) {
-			cards.addAll(s);
-		}
+	public Set<Card> getCards() {
+		Set<Card> cards = new HashSet<Card>();
+		Arrays.asList(hand).forEach(cards::addAll);
 		return cards;
 	}
 
@@ -70,7 +69,7 @@ public class Hand {
 	 * @return A set containing the cards held in the suit.
 	 */
 	public Set<Card> getSuit(int suit) {
-		return new HashSet(hand[suit]);
+		return new HashSet<Card>(hand[suit]);
 	}
 
 	/**
@@ -89,10 +88,6 @@ public class Hand {
 	 * @return The number of cards in the hand.
 	 */
 	public int getNumCards() {
-		int num = 0;
-		for (Set s : hand) {
-			num += s.size();
-		}
-		return num;
+		return Arrays.asList(hand).stream().mapToInt(Set<Card>::size).sum();
 	}
 }
