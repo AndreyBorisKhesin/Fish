@@ -10,7 +10,6 @@ public class OtherPlayerData {
 	public final int numCards;
 	
 	public OtherPlayerData(Team t, int numCards) {
-		super();
 		this.t = t;
 		this.numCards = numCards;
 	}
