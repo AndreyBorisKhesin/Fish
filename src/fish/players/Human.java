@@ -3,6 +3,6 @@ package fish.players;
 /**
  * A Player who is controlled by a Human.
  */
-public class Human implements Player {
+public class Human extends Player {
 
 }
