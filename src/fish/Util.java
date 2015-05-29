@@ -1,5 +1,8 @@
 package fish;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * General class for utility variables and methods.
  */
@@ -22,5 +25,18 @@ public class Util {
 
 	public static boolean isZero(double a) {
 		return Math.abs(a) < EPS;
+	}
+
+	/**
+	 * Returns a full deck of cards
+	 * 
+	 * @return A full deck of cards
+	 */
+	public static List<Card> deck() {
+		List<Card> deck = new ArrayList<Card>();
+		for (int i = 0; i < 48; i++) {
+			deck.add(new Card(i));
+		}
+		return deck;
 	}
 }

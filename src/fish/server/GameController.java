@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import fish.Card;
 import fish.Team;
 import fish.Util;
 import fish.events.Event;
@@ -77,10 +78,22 @@ public class GameController {
 							.get(i)), inters.get(i)));
 		}
 
+		dealDeck();
+
 		sendGameState();
 		sendGameStart();
 
 		mainGameLoop();
+	}
+
+	private void dealDeck() {
+		List<Card> deck = Util.deck();
+		Collections.shuffle(deck);
+		int numplayers = gs.players.size();
+		for (int i = 0; i < deck.size(); i++) {
+			Card c = deck.get(i);
+			gs.players.get(i % numplayers).s.hand.insert(c);
+		}
 	}
 
 	private void sendGameState() {
