@@ -1,14 +1,18 @@
 package fish.server;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import fish.Team;
 import fish.Util;
 import fish.events.Event;
+
+import static fish.server.Log.log;
 
 /**
  * The object controlling the game flow. It shall communicate with player
@@ -16,27 +20,28 @@ import fish.events.Event;
  * 
  */
 public class GameController {
-	/**
-	 * A list of fish.events that have occurred this far into the game, such as
-	 * question asked and declarations
-	 */
-	private List<Event> events;
 
 	/**
-	 * The set of halfsuits that have already been declared, and the players
-	 * that declared them
+	 * The thread in which this game controller operates
 	 */
-	private HashMap<Integer, Integer> declared;
-
-	/**
-	 * The containers for the players of the games
-	 */
-	private List<PlayerContainer> players;
+	private Thread t;
 
 	/**
 	 * The queue of input messages received from clients
 	 */
 	private ConcurrentLinkedQueue<ServerMessage> sq;
+
+	/**
+	 * Data object holding the current game state
+	 */
+	private GameState gs;
+
+	/**
+	 * Initializes data structures used in game operation
+	 */
+	public GameController() {
+		gs = new GameState();
+	}
 
 	/**
 	 * Begins the game with the given players
@@ -50,8 +55,14 @@ public class GameController {
 			throw new IllegalArgumentException(
 					"Invalid number of players: "
 							+ inters.size());
-		this.sq = sq;
 
+		this.t = Thread.currentThread();
+		this.sq = sq;
+		initGame(inters);
+
+	}
+
+	private void initGame(List<PlayerInterface> inters) {
 		List<Team> teams = new ArrayList<Team>();
 		for (int i = 0; i < inters.size(); i++) {
 			teams.add(i < inters.size() / 2 ? Team.BLK : Team.RED);
@@ -59,8 +70,75 @@ public class GameController {
 		Collections.shuffle(teams);
 
 		for (int i = 0; i < inters.size(); i++) {
-			players.add(new PlayerContainer(new PlayerState(i,
-					teams.get(i)), inters.get(i)));
+			gs.players.add(new PlayerContainer(
+					new PlayerState(i, inters.get(i)
+							.getUname(), teams
+							.get(i)), inters.get(i)));
+		}
+	}
+
+	private void mainGameLoop() {
+		while (gs.running) {
+			while (sq.isEmpty()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					/*
+					 * ignore this exception, it means a
+					 * message was added
+					 */
+				}
+			}
+
+			/*
+			 * there are no other consumers of this queue so we can
+			 * safely dequeue
+			 */
+			ServerMessage m = sq.poll();
+			if (m == null) {
+				log("attempted to dequeue from server queue and found it empty");
+			}
+		}
+	}
+
+	/**
+	 * Asynchronously adds a message to be processed by the server
+	 */
+	public void insertMessage(ServerMessage m) {
+		sq.add(m);
+		t.interrupt();
+	}
+
+	private class GameState {
+		/**
+		 * A list of fish.events that have occurred this far into the
+		 * game, such
+		 * as question asked and declarations
+		 */
+		private List<Event> events;
+
+		/**
+		 * The set of half suits that have already been declared, and
+		 * the players
+		 * that declared them
+		 */
+		private Map<Integer, Integer> declared;
+
+		/**
+		 * The containers for the players of the games
+		 */
+		private List<PlayerContainer> players;
+
+		/**
+		 * Indicates whether the game is still running
+		 */
+		private boolean running;
+
+		private GameState() {
+			events = new ArrayList<Event>();
+			declared = new HashMap<Integer, Integer>();
+			players = new ArrayList<GameController.PlayerContainer>();
+			running = false;
 		}
 	}
 
