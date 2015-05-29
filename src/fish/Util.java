@@ -14,4 +14,13 @@ public class Util {
 	public static boolean validPlayerNum(int n) {
 		return n == 4 || n == 6 || n == 8 || n == 12;
 	}
+
+	/**
+	 * Generic floating point epsilon value
+	 */
+	public static final Double EPS = 1e-6;
+
+	public static boolean isZero(double a) {
+		return Math.abs(a) < EPS;
+	}
 }

@@ -1,7 +1,8 @@
 package fish.server;
 
-import java.util.ArrayList;
+import static fish.server.Log.log;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import fish.Team;
 import fish.Util;
 import fish.events.Event;
-
-import static fish.server.Log.log;
+import fish.server.playermessages.GameStart;
+import fish.server.playermessages.PlayerKnowledge;
 
 /**
  * The object controlling the game flow. It shall communicate with player
@@ -74,6 +75,35 @@ public class GameController {
 					new PlayerState(i, inters.get(i)
 							.getUname(), teams
 							.get(i)), inters.get(i)));
+		}
+
+		sendGameState();
+		sendGameStart();
+
+		mainGameLoop();
+	}
+
+	private void sendGameState() {
+		/* the data to send to other players about each other */
+		List<OtherPlayerData> others = new ArrayList<OtherPlayerData>();
+		for (int i = 0; i < gs.players.size(); i++) {
+			PlayerState ps = gs.players.get(i).s;
+			others.add(new OtherPlayerData(i, ps.uname, ps.team,
+					ps.hand.getNumCards()));
+		}
+
+		for (int i = 0; i < gs.players.size(); i++) {
+			PlayerKnowledge pk = new PlayerKnowledge(
+					gs.players.get(i).s, gs.declared,
+					others);
+
+			gs.players.get(i).i.insertMessage(pk);
+		}
+	}
+
+	private void sendGameStart() {
+		for (PlayerContainer pc : gs.players) {
+			pc.i.insertMessage(new GameStart());
 		}
 	}
 

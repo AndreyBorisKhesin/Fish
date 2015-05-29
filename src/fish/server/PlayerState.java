@@ -9,7 +9,7 @@ import fish.Team;
  * Holds the set of information for one player including cards held, and suits
  * taken.
  */
-class PlayerState {
+public class PlayerState {
 
 	/**
 	 * The number of the Player.
