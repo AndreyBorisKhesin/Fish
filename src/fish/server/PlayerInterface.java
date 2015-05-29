@@ -20,9 +20,15 @@ public abstract class PlayerInterface implements Runnable {
 	 */
 	protected ConcurrentLinkedQueue<PlayerMessage> mqueue;
 
-	public PlayerInterface() {
+	/**
+	 * The username of this user
+	 */
+	protected String uname;
+
+	public PlayerInterface(String uname) {
 		mqueue = new ConcurrentLinkedQueue<>();
 		t = new Thread(this);
+		this.uname = uname;
 	}
 
 	/**
@@ -33,7 +39,8 @@ public abstract class PlayerInterface implements Runnable {
 	}
 
 	/**
-	 * Provides a game controller object for communication with the game state.
+	 * Provides a game controller object for communication with the game
+	 * state.
 	 * 
 	 * @param g The GameController object running the current game.
 	 */
@@ -62,5 +69,12 @@ public abstract class PlayerInterface implements Runnable {
 	 */
 	public void insertMessage(PlayerMessage pm) {
 		mqueue.add(pm);
+	}
+
+	/**
+	 * Returns the assigned username for this player
+	 */
+	public String getUname() {
+		return uname;
 	}
 }
