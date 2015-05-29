@@ -1,5 +1,7 @@
 package fish;
 
+import static fish.Util.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,9 @@ public class QuantumHand {
 	 * Elements 0 to 7 are specific suits.
 	 * Element 8 is the generic suit.
 	 */
-	private Map<Card, Double>[] hand = new Map[9];
+	private Map<Card, Double>[] quantumHand = new Map[9];
+
+	private Hand hand = new Hand();
 
 	private int[][] bounds = new int[9][2];
 
@@ -25,11 +29,11 @@ public class QuantumHand {
 	 * It contains each Card with equal probability.
 	 */
 	public QuantumHand() {
-		for (int i = 0; i < hand.length; i++) {
-			hand[i] = new HashMap<>();
+		for (int i = 0; i < quantumHand.length; i++) {
+			quantumHand[i] = new HashMap<>();
 		}
 		for (int i = 0; i < 48; i++) {
-			hand[8].put(new Card(i), 1d / 6);
+			quantumHand[8].put(new Card(i), 1d / 6);
 		}
 		bounds[8][0] = 8;
 		bounds[8][1] = 8;
@@ -40,23 +44,38 @@ public class QuantumHand {
 			if (!moved[i] && bounds[i][0] == bounds[i][1]) {
 				for (int j = 0; j < 6; j++) {
 					Card c = new Card(i * 6 + j);
-					if (hand[8].containsKey(c)) {
-						hand[i].put(c, hand[8].remove(c));
+					if (quantumHand[8].containsKey(c)) {
+						quantumHand[i].put(c, quantumHand[8].remove(c));
 					}
 				}
 				moved[i] = true;
+				bounds[8][0] -= bounds[i][0];
+				bounds[8][1] -= bounds[i][0];
 			}
-			if (moved[i]) {
-				double sum = hand[i].values().stream().reduce(0d, Double::sum);
-				double ratio = hand[i].size() / sum;
+			for (int j = 0; j < 6; j++) {
+				Card c = new Card(6 * i + j);
+				if (quantumHand[i].containsKey(c) && isZero(quantumHand[i].get(c) - 1)) {
+					quantumHand[i].remove(c);
+					hand.add(c);
+					bounds[i][0]--;
+					bounds[i][1]--;
+				}
+			}
+			if (moved[i] && quantumHand[i].size() > 0) {
+				double sum = quantumHand[i].values().stream().reduce(0d, Double::sum);
+				double ratio = quantumHand[i].size() / sum;
 				final int j = i;
-				hand[i].entrySet().forEach((Map.Entry<Card, Double> e) ->
-						hand[j].put(e.getKey(), e.getValue() * ratio));
+				quantumHand[i].entrySet().forEach((Map.Entry<Card, Double> e) ->
+						quantumHand[j].put(e.getKey(), e.getValue() * ratio));
 			}
 		}
 	}
 
-	public Map<Card, Double>[] getHand() {
+	public Hand getHand() {
 		return hand;
+	}
+
+	public Map<Card, Double>[] getQuantumHand() {
+		return quantumHand;
 	}
 }

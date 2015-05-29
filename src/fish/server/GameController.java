@@ -92,7 +92,7 @@ public class GameController {
 		int numplayers = gs.players.size();
 		for (int i = 0; i < deck.size(); i++) {
 			Card c = deck.get(i);
-			gs.players.get(i % numplayers).s.hand.insert(c);
+			gs.players.get(i % numplayers).s.hand.add(c);
 		}
 	}
 

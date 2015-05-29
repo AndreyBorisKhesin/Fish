@@ -30,7 +30,7 @@ public class Hand {
 	 */
 	public Hand(Set<Card> cards) {
 		this();
-		cards.forEach(this::insert);
+		cards.forEach(this::add);
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class Hand {
 	 * 
 	 * @param c Card to be inserted.
 	 */
-	public void insert(Card c) {
+	public void add(Card c) {
 		hand[c.suit].add(c);
 	}
 
