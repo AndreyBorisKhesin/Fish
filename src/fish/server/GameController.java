@@ -101,7 +101,7 @@ public class GameController {
 		List<OtherPlayerData> others = new ArrayList<OtherPlayerData>();
 		for (int i = 0; i < gs.players.size(); i++) {
 			PlayerState ps = gs.players.get(i).s;
-			others.add(new OtherPlayerData(i, ps.uname, ps.team,
+			others.add(new OtherPlayerData(i, ps.name, ps.team,
 					ps.hand.getNumCards()));
 		}
 

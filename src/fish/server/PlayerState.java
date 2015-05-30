@@ -17,9 +17,9 @@ public class PlayerState {
 	public final int id;
 
 	/**
-	 * The username of the player.
+	 * The name of the player.
 	 */
-	public final String uname;
+	public final String name;
 
 	/**
 	 * The team of the Player.
@@ -40,13 +40,14 @@ public class PlayerState {
 	 * PlayerState constructor accepting an ID and a Team.
 	 *
 	 * @param id The ID of the Player.
+	 * @param name The name of the Player.
 	 * @param team The Team of the Player.
 	 */
-	PlayerState(int id, String uname, Team team) {
+	PlayerState(int id, String name, Team team) {
 		this.id = id;
-		this.uname = uname;
+		this.name = name;
 		this.team = team;
 		hand = new Hand();
-		tricks = new HashSet<Integer>();
+		tricks = new HashSet<>();
 	}
 }
