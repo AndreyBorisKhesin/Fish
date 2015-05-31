@@ -88,7 +88,7 @@ public class GameController {
 		int numplayers = gs.players.size();
 		for (int i = 0; i < deck.size(); i++) {
 			Card c = deck.get(i);
-			gs.players.get(i % numplayers).s.hand.insert(c);
+			gs.players.get(i % numplayers).s.hand.add(c);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class GameController {
 		List<OtherPlayerData> others = new ArrayList<OtherPlayerData>();
 		for (int i = 0; i < gs.players.size(); i++) {
 			PlayerState ps = gs.players.get(i).s;
-			others.add(new OtherPlayerData(i, ps.uname, ps.team,
+			others.add(new OtherPlayerData(i, ps.name, ps.team,
 					ps.hand.getNumCards()));
 		}
 
