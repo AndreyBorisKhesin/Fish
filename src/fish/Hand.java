@@ -78,7 +78,7 @@ public class Hand {
 	 * @param c The card to query.
 	 * @return True if the player has this card, false otherwise.
 	 */
-	public boolean has(Card c) {
+	public boolean contains(Card c) {
 		return hand[c.suit].contains(c);
 	}
 

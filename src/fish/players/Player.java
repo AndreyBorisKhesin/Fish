@@ -9,13 +9,13 @@ import java.util.Set;
  * An interface for all Humans and AI's playing the game.
  */
 public abstract class Player {
-	private Hand hand;
+	protected Hand hand;
 
-	private Team team;
+	protected Team team;
 
-	private String name;
+	protected String name;
 
-	private int id;
+	protected int id;
 
-	private Set<Integer> tricks;
+	protected Set<Integer> tricks;
 }

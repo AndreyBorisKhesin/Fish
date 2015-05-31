@@ -17,7 +17,7 @@ public class PlayerKnowledge implements PlayerMessage {
 	}
 	
 	/**
-	 * The players state for the player this is being sent to.
+	 * The Player's state for the Player this is being sent to.
 	 */
 	public PlayerState pstate;
 	
@@ -27,14 +27,14 @@ public class PlayerKnowledge implements PlayerMessage {
 	public Map<Integer, Integer> tricks;
 	
 	/**
-	 * The visible state of other players.
+	 * The visible state of other Players.
 	 */
-	public List<OtherPlayerData> otherplayers;
+	public List<OtherPlayerData> otherPlayers;
 
 	public PlayerKnowledge(PlayerState pstate, Map<Integer, Integer> tricks,
-			List<OtherPlayerData> otherplayers) {
+			List<OtherPlayerData> otherPlayers) {
 		this.pstate = pstate;
 		this.tricks = tricks;
-		this.otherplayers = otherplayers;
+		this.otherPlayers = otherPlayers;
 	}
 }

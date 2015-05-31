@@ -16,7 +16,7 @@ public class QuantumHand {
 	 * Elements 0 to 7 are specific suits.
 	 * Element 8 is the generic suit.
 	 */
-	private Map<Card, Double>[] quantumHand = new Map[9];
+	private HashMap<Card, Double>[] quantumHand = new HashMap[9];
 
 	/**
 	 * Cards that the Player definitely holding.
@@ -26,7 +26,7 @@ public class QuantumHand {
 	/**
 	 * Bounds on the possible number of cards in a suit that a Player can have.
 	 */
-	private int[][] bounds = new int[9][2];
+	private int[][] bounds = new int[8][2];
 
 	/**
 	 * An array storing if a suit was moved away from the generic suit or not.
@@ -38,39 +38,56 @@ public class QuantumHand {
 	 * Contains each Card with equal probability.
 	 */
 	public QuantumHand() {
-		for (int i = 0; i < quantumHand.length; i++) {
+		for (int i = 0; i < 8; i++) {
 			quantumHand[i] = new HashMap<>();
+			bounds[i][0] = 0;
+			bounds[i][1] = 6;
 		}
+		quantumHand[8] = new HashMap<>();
 		for (int i = 0; i < 48; i++) {
 			quantumHand[8].put(new Card(i), 1d / 6);
 		}
-		bounds[8][0] = 8;
-		bounds[8][1] = 8;
+	}
+
+	public int suit(int suit) {
+		return moved[suit] ? suit : 8;
+	}
+
+	public int suit(Card c) {
+		return suit(c.suit);
 	}
 
 	/**
-	 * Updates and rebalances the QuantumHand.
+	 * Updates and re-balances the QuantumHand.
 	 */
 	public void update() {
 		boolean b = true;
 		while (b) {
 			b = false;
 			for (int i = 0; i < 8; i++) {
-				if (!moved[i] && bounds[i][0] == bounds[i][1]) {
-					for (int j = 0; j < 6; j++) {
-						Card c = new Card(i * 6 + j);
-						if (quantumHand[8].containsKey(c)) {
-							quantumHand[i].put(c, quantumHand[8].remove(c));
+				if (!moved[i]) {
+					int pos = 0;
+					for (Card c : (Card[]) quantumHand[8].keySet().toArray()) {
+						if (c.suit == i) {
+							pos++;
 						}
 					}
-					moved[i] = true;
-					bounds[8][0] -= bounds[i][0];
-					bounds[8][1] -= bounds[i][0];
-					b = true;
+					bounds[i][1] = Math.min(bounds[i][1], pos);
+					if (bounds[i][0] == bounds[i][1]) {
+						for (int j = 0; j < 6; j++) {
+							Card c = new Card(i * 6 + j);
+							if (quantumHand[8].containsKey(c)) {
+								quantumHand[i].put(c, quantumHand[8].remove(c));
+							}
+						}
+						moved[i] = true;
+						b = true;
+					}
 				}
 				for (int j = 0; j < 6; j++) {
 					Card c = new Card(6 * i + j);
-					if (quantumHand[i].containsKey(c) && isZero(quantumHand[i].get(c) - 1)) {
+					if (quantumHand[i].containsKey(c)
+							&& isZero(quantumHand[i].get(c) - 1)) {
 						quantumHand[i].remove(c);
 						hand.add(c);
 						bounds[i][0]--;
@@ -79,20 +96,27 @@ public class QuantumHand {
 					}
 				}
 				if (moved[i] && quantumHand[i].size() > 0) {
-					double sum = quantumHand[i].values().stream().reduce(0d, Double::sum);
+					double sum = quantumHand[i].values().stream().reduce(0d,
+							Double::sum);
 					double ratio = quantumHand[i].size() / sum;
 					final int j = i;
-					quantumHand[i].entrySet().forEach((Map.Entry<Card, Double> e) ->
-							quantumHand[j].put(e.getKey(), e.getValue() * ratio));
+					quantumHand[i].entrySet().forEach((HashMap.Entry<Card,
+							Double> e) -> quantumHand[j].put(e.getKey(),
+							e.getValue() * ratio));
 					b |= !isZero(ratio - 1);
 				}
 			}
-			double sum = quantumHand[8].values().stream().reduce(0d, Double::sum);
+			double sum = quantumHand[8].values().stream().reduce(0d,
+					Double::sum);
 			double ratio = quantumHand[8].size() / sum;
-			quantumHand[8].entrySet().forEach((Map.Entry<Card, Double> e) ->
+			quantumHand[8].entrySet().forEach((HashMap.Entry<Card, Double> e) ->
 					quantumHand[8].put(e.getKey(), e.getValue() * ratio));
 			b |= !isZero(ratio - 1);
 		}
+	}
+
+	public void zero(Card c) {
+		quantumHand[suit(c)].remove(c);
 	}
 
 	/**
@@ -100,7 +124,7 @@ public class QuantumHand {
 	 *
 	 * @return The list of Cards that are possibly in the QuantumHand.
 	 */
-	public Map<Card, Double>[] getQuantumHand() {
+	public HashMap<Card, Double>[] getQuantumHand() {
 		return quantumHand;
 	}
 
@@ -111,5 +135,9 @@ public class QuantumHand {
 	 */
 	public Hand getHand() {
 		return hand;
+	}
+
+	public int[][] getBounds() {
+		return bounds;
 	}
 }

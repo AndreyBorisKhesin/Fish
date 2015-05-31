@@ -10,17 +10,17 @@ public class Question extends Event {
 	/**
 	 * The person asking the question.
 	 */
-	final int source;
+	public final int source;
 
 	/**
 	 * The person being asked.
 	 */
-	final int dest;
+	public final int dest;
 
 	/**
 	 * The card being asked for.
 	 */
-	final Card c;
+	public final Card c;
 
 	/**
 	 * Basic constructor for the question.
