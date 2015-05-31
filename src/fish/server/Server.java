@@ -42,13 +42,11 @@ public class Server implements Runnable {
 		sq = new ConcurrentLinkedQueue<ServerMessage>();
 		clients = new ArrayList<PlayerInterface>();
 		
-		(new Thread(this)).start();
+		(t = new Thread(this)).start();
 	}
 
 	@Override
 	public void run() {
-		t = Thread.currentThread();
-
 		while (true) {
 			ServerMessage sm = waitOnQueue(sq);
 
@@ -72,7 +70,9 @@ public class Server implements Runnable {
 	 */
 	public void insertMessage(ServerMessage m) {
 		sq.add(m);
-		t.interrupt();
+		synchronized(sq) {
+			sq.notify();
+		}
 	}
 
 	/**
@@ -84,13 +84,11 @@ public class Server implements Runnable {
 	 */
 	public static <T> T waitOnQueue(ConcurrentLinkedQueue<T> q) {
 		while (q.isEmpty()) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				/*
-				 * ignore this exception, it means a
-				 * message was added
-				 */
+			synchronized(q) {
+				try {
+					q.wait();
+				} catch (InterruptedException e) {
+				}
 			}
 		}
 

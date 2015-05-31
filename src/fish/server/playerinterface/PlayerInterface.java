@@ -35,12 +35,12 @@ public abstract class PlayerInterface implements Runnable {
 	 * The server with which the interface is communicating
 	 */
 	protected Server s;
-	
+
 	/**
 	 * The game controller to be accessed by a player
 	 */
 	protected GameController gc;
-	
+
 	public PlayerInterface(String uname, Server s) {
 		mqueue = new ConcurrentLinkedQueue<>();
 		t = new Thread(this);
@@ -81,6 +81,9 @@ public abstract class PlayerInterface implements Runnable {
 	 */
 	public void insertMessage(PlayerMessage pm) {
 		mqueue.add(pm);
+		synchronized (mqueue) {
+			mqueue.notify();
+		}
 	}
 
 	/**
