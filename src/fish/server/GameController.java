@@ -7,14 +7,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import fish.Card;
 import fish.Team;
 import fish.Util;
 import fish.events.Event;
-import fish.server.playermessages.GameStart;
-import fish.server.playermessages.PlayerKnowledge;
+import fish.server.messages.PMGameStart;
+import fish.server.messages.PMGameState;
+import fish.server.messages.ServerMessage;
+import fish.server.playerinterface.PlayerInterface;
 
 /**
  * The object controlling the game flow. It shall communicate with player
@@ -24,14 +25,9 @@ import fish.server.playermessages.PlayerKnowledge;
 public class GameController {
 
 	/**
-	 * The thread in which this game controller operates
+	 * The server that the clients are connected to
 	 */
-	private Thread t;
-
-	/**
-	 * The queue of input messages received from clients
-	 */
-	private ConcurrentLinkedQueue<ServerMessage> sq;
+	private Server s;
 
 	/**
 	 * Data object holding the current game state
@@ -46,22 +42,22 @@ public class GameController {
 	}
 
 	/**
-	 * Begins the game with the given players
+	 * Begins the game with the given players.
 	 * 
-	 * @param inters The interfaces with which to communicate with the
-	 * players
+	 * @param s The server being used for communication with players.
 	 */
-	public void startGame(List<PlayerInterface> inters,
-			ConcurrentLinkedQueue<ServerMessage> sq) {
-		if (!Util.validPlayerNum(inters.size()))
+	void startGame(Server s) {
+		if (!Util.validPlayerNum(s.clients.size()))
 			throw new IllegalArgumentException(
 					"Invalid number of players: "
-							+ inters.size());
+							+ s.clients.size());
+		if (Thread.currentThread() != s.t) {
+			throw new IllegalArgumentException(
+					"Server passed is running in a different thread from this.");
+		}
 
-		this.t = Thread.currentThread();
-		this.sq = sq;
-		initGame(inters);
-
+		this.s = s;
+		initGame(s.clients);
 	}
 
 	private void initGame(List<PlayerInterface> inters) {
@@ -106,7 +102,7 @@ public class GameController {
 		}
 
 		for (int i = 0; i < gs.players.size(); i++) {
-			PlayerKnowledge pk = new PlayerKnowledge(
+			PMGameState pk = new PMGameState(
 					gs.players.get(i).s, gs.declared,
 					others);
 
@@ -116,40 +112,20 @@ public class GameController {
 
 	private void sendGameStart() {
 		for (PlayerContainer pc : gs.players) {
-			pc.i.insertMessage(new GameStart());
+			pc.i.insertMessage(new PMGameStart());
 		}
 	}
 
 	private void mainGameLoop() {
 		while (gs.running) {
-			while (sq.isEmpty()) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					/*
-					 * ignore this exception, it means a
-					 * message was added
-					 */
-				}
-			}
+			ServerMessage sm = Server.waitOnQueue(s.sq);
 
-			/*
-			 * there are no other consumers of this queue so we can
-			 * safely dequeue
-			 */
-			ServerMessage m = sq.poll();
-			if (m == null) {
-				log("attempted to dequeue from server queue and found it empty");
-			}
+			processMessage(sm);
 		}
 	}
 
-	/**
-	 * Asynchronously adds a message to be processed by the server
-	 */
-	public void insertMessage(ServerMessage m) {
-		sq.add(m);
-		t.interrupt();
+	private void processMessage(ServerMessage sm) {
+
 	}
 
 	private class GameState {

@@ -88,4 +88,9 @@ public class Card {
 	public int hashCode() {
 		return suit * 6 + rank;
 	}
+	
+	@Override
+	public String toString() {
+		return ("" + suit) + rank;
+	}
 }

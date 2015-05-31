@@ -1,4 +1,4 @@
-package fish.server.playermessages;
+package fish.server.messages;
 
 /**
  * A message to send to a player.

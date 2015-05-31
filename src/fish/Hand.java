@@ -88,6 +88,16 @@ public class Hand {
 	 * @return The number of cards in the hand.
 	 */
 	public int getNumCards() {
-		return Arrays.asList(hand).stream().mapToInt(Set<Card>::size).sum();
+		return Arrays.asList(hand).stream().mapToInt(Set<Card>::size)
+				.sum();
+	}
+
+	@Override
+	public String toString() {
+		Set<Card> cards = getCards();
+		StringBuilder sb = new StringBuilder("{");
+		cards.forEach((Card c) -> sb.append(c + ","));
+
+		return sb.toString();
 	}
 }
