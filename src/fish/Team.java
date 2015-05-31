@@ -24,4 +24,17 @@ public enum Team {
 					"TEAM ENUM NOT MATCHING EITHER VALUE");
 		}
 	}
+
+	@Override
+	public String toString() {
+		switch (this) {
+		case RED:
+			return "RED";
+		case BLK:
+			return "BLK";
+		default:
+			throw new RuntimeException(
+					"TEAM ENUM NOT MATCHING EITHER VALUE");
+		}
+	}
 }

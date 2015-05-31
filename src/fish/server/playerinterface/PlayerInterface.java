@@ -1,9 +1,10 @@
-package fish.server;
+package fish.server.playerinterface;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import fish.events.Question;
-import fish.server.playermessages.PlayerMessage;
+import fish.server.GameController;
+import fish.server.Server;
+import fish.server.messages.PlayerMessage;
 
 /**
  * An interface to define interactions between the player and server.
@@ -21,14 +22,30 @@ public abstract class PlayerInterface implements Runnable {
 	protected ConcurrentLinkedQueue<PlayerMessage> mqueue;
 
 	/**
+	 * The id of this user, used for sending messages.
+	 */
+	protected int id;
+
+	/**
 	 * The username of this user
 	 */
 	protected String uname;
 
-	public PlayerInterface(String uname) {
+	/**
+	 * The server with which the interface is communicating
+	 */
+	protected Server s;
+
+	/**
+	 * The game controller to be accessed by a player
+	 */
+	protected GameController gc;
+
+	public PlayerInterface(String uname, Server s) {
 		mqueue = new ConcurrentLinkedQueue<>();
 		t = new Thread(this);
 		this.uname = uname;
+		this.s = s;
 	}
 
 	/**
@@ -42,16 +59,11 @@ public abstract class PlayerInterface implements Runnable {
 	 * Provides a game controller object for communication with the game
 	 * state.
 	 * 
-	 * @param g The GameController object running the current game.
+	 * @param gc The GameController object running the current game.
 	 */
-	public abstract void setController(GameController g);
-
-	/**
-	 * Requests the player to ask a question.
-	 * 
-	 * @return A question object representing the requested question.
-	 */
-	public abstract Question getQuestion();
+	public void setController(GameController gc) {
+		this.gc = gc;
+	}
 
 	/**
 	 * Returns the thread operating this player.
@@ -69,6 +81,9 @@ public abstract class PlayerInterface implements Runnable {
 	 */
 	public void insertMessage(PlayerMessage pm) {
 		mqueue.add(pm);
+		synchronized (mqueue) {
+			mqueue.notify();
+		}
 	}
 
 	/**
