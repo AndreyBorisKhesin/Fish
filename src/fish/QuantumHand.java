@@ -16,7 +16,7 @@ public class QuantumHand {
 	 * Elements 0 to 7 are specific suits.
 	 * Element 8 is the generic suit.
 	 */
-	private HashMap<Card, Double>[] quantumHand = new HashMap[9];
+	private Map<Card, Double>[] quantumHand = new Map[9];
 
 	/**
 	 * Cards that the Player definitely holding.
@@ -100,7 +100,7 @@ public class QuantumHand {
 							Double::sum);
 					double ratio = quantumHand[i].size() / sum;
 					final int j = i;
-					quantumHand[i].entrySet().forEach((HashMap.Entry<Card,
+					quantumHand[i].entrySet().forEach((Map.Entry<Card,
 							Double> e) -> quantumHand[j].put(e.getKey(),
 							e.getValue() * ratio));
 					b |= !isZero(ratio - 1);
@@ -109,7 +109,7 @@ public class QuantumHand {
 			double sum = quantumHand[8].values().stream().reduce(0d,
 					Double::sum);
 			double ratio = quantumHand[8].size() / sum;
-			quantumHand[8].entrySet().forEach((HashMap.Entry<Card, Double> e) ->
+			quantumHand[8].entrySet().forEach((Map.Entry<Card, Double> e) ->
 					quantumHand[8].put(e.getKey(), e.getValue() * ratio));
 			b |= !isZero(ratio - 1);
 		}
@@ -124,7 +124,7 @@ public class QuantumHand {
 	 *
 	 * @return The list of Cards that are possibly in the QuantumHand.
 	 */
-	public HashMap<Card, Double>[] getQuantumHand() {
+	public Map<Card, Double>[] getQuantumHand() {
 		return quantumHand;
 	}
 

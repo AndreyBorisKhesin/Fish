@@ -67,7 +67,7 @@ public class PlayerState {
 
 		out.add(prepend + "{\n");
 		out.add(prepend + "\tid: " + id + ",\n");
-		out.add(prepend + "\tuname: " + uname + ",\n");
+		out.add(prepend + "\tuname: " + name + ",\n");
 		out.add(prepend + "\tteam: " + team + ",\n");
 		out.add(prepend + "\thand: " + hand + ",\n");
 		out.add(prepend + "\ttricks: " + tricks + ",\n");
