@@ -52,7 +52,6 @@ public class Card {
 		this(hashCode / 6, hashCode % 6);
 	}
 
-
 	/**
 	 * Returns a clone of this Card.
 	 *
@@ -79,7 +78,8 @@ public class Card {
 	}
 
 	/**
-	 * Returns a hashcode uniquely representing the Card in the form of suit * 6
+	 * Returns a hashcode uniquely representing the Card in the form of suit
+	 * * 6
 	 * + rank.
 	 *
 	 * @return Returns hashcode for the Card.
@@ -88,9 +88,25 @@ public class Card {
 	public int hashCode() {
 		return suit * 6 + rank;
 	}
-	
+
 	@Override
 	public String toString() {
 		return ("" + suit) + rank;
+	}
+
+	/**
+	 * Returns a human readable string for this card
+	 * 
+	 * @return A string in the form "Jack of Hearts" or similar
+	 */
+	public String humanRep() {
+		final String suits[] = { "Clubs", "Diamonds", "Hearts",
+				"Spades" };
+		final String ranks[][] = {
+				{ "Two", "Three", "Four", "Five", "Six",
+						"Seven" },
+				{ "Nine", "Ten", "Jack", "Queen", "King", "Ace" } };
+
+		return ranks[suit % 2][rank] + " of " + suits[suit / 2];
 	}
 }

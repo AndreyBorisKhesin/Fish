@@ -1,18 +1,16 @@
-package fish.events;
+package fish.server;
 
 import java.time.Instant;
 
 /**
  * Represents a game event.
  */
-public abstract class Event {
+public class Event {
 	public final Instant timestamp;
+	public final String message;
 
-	public Event() {
+	public Event(String s) {
 		timestamp = Instant.now();
-	}
-
-	public enum EventType {
-		QUESTION, DEC_START, DEC_END;
+		this.message = s;
 	}
 }

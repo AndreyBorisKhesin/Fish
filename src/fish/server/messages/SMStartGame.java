@@ -1,7 +1,9 @@
 package fish.server.messages;
 
-import fish.server.playerinterface.PlayerInterface;
-
+/**
+ * Indicates that this is a message to start the game
+ *
+ */
 public class SMStartGame implements ServerMessage {
 
 	@Override
@@ -21,10 +23,5 @@ public class SMStartGame implements ServerMessage {
 	@Override
 	public String toString() {
 		return "Server Message: START_GAME\nid: " + id;
-	}
-
-	@Override
-	public int getId() {
-		return id;
 	}
 }

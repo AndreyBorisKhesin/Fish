@@ -23,11 +23,6 @@ public class SMReady implements ServerMessage {
 	}
 
 	@Override
-	public int getId() {
-		return id;
-	}
-
-	@Override
 	public String toString() {
 		return "Server Message: READY\nid: " + id + ",\nready: " + ready;
 	}

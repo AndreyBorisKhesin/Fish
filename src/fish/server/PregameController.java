@@ -49,15 +49,17 @@ public class PregameController implements Controller {
 		sm.pi.insertMessage(new PMConnected(s.clients.size() - 1));
 		readied.add(false);
 		sendPregameUpdate();
+		Log.log(sm.pi.getUname() + " connected");
 	}
 
 	private void readyUpdate(SMReady sm) {
 		readied.set(sm.id, sm.ready);
+		Log.log(s.getUname(sm.id) + " changed ready state: " + sm.ready);
 		sendPregameUpdate();
 	}
 	
 	private void startGame(SMStartGame sm) {
-		if(sm.getId() != 0 || !Util.validPlayerNum(s.clients.size())) {
+		if (sm.id != 0 || !Util.validPlayerNum(s.clients.size())) {
 			return;
 		}
 		for(Boolean b : readied) {
@@ -66,6 +68,7 @@ public class PregameController implements Controller {
 			}
 		}
 		
+		Log.log(s.getUname(0) + " started the game");
 		s.switchState(ServerState.GAME);
 	}
 
@@ -75,11 +78,7 @@ public class PregameController implements Controller {
 			usernames.add(p.getUname());
 		}
 
-		PMPregameUpdate pm = new PMPregameUpdate(usernames, readied);
-
-		for (PlayerInterface p : s.clients) {
-			p.insertMessage(pm);
-		}
+		s.broadcast(new PMPregameUpdate(usernames, readied));
 	}
 
 	@Override

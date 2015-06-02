@@ -37,17 +37,18 @@ public class PMGameState implements PlayerMessage {
 	 */
 	public int turn;
 
-	public PMGameState(PlayerState pstate,
-			Map<Integer, Integer> tricks,
-			List<OtherPlayerData> otherplayers) {
+	public PMGameState(PlayerState pstate, Map<Integer, Integer> tricks,
+			List<OtherPlayerData> otherplayers, int turn) {
 		this.pstate = pstate;
 		this.tricks = tricks;
 		this.otherplayers = otherplayers;
+		this.turn = turn;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder str = new StringBuilder("Player Message: GAME_STATE\n");
+		StringBuilder str = new StringBuilder(
+				"Player Message: GAME_STATE\n");
 		stringFormat(0).forEach(str::append);
 		return str.toString();
 	}
@@ -82,6 +83,9 @@ public class PMGameState implements PlayerMessage {
 				out.add(prepend + ",\n");
 			}
 			out.add(prepend + "\t],\n");
+		}
+		{
+			out.add(prepend + "\tturn: " + turn + "\n");
 		}
 		out.add(prepend + "}");
 

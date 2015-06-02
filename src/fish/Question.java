@@ -1,11 +1,10 @@
-package fish.events;
+package fish;
 
-import fish.Card;
 
 /**
  * A data object representing a query from one player to another.
  */
-public class Question extends Event {
+public class Question {
 
 	/**
 	 * The person asking the question.
@@ -33,5 +32,10 @@ public class Question extends Event {
 		this.source = source;
 		this.dest = dest;
 		this.c = c;
+	}
+	
+	@Override
+	public String toString() {
+		return "{source: " + source + ", dest: " + dest + ", card: " + c + "}";
 	}
 }

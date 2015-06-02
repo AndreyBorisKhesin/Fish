@@ -22,10 +22,4 @@ public class SMConnection implements ServerMessage {
 	public String toString() {
 		return "Server Message: CONNECTION\n" + pi;
 	}
-
-	@Override
-	public int getId() {
-		/* we haven't been assigned an id yet */
-		return -1;
-	}
 }

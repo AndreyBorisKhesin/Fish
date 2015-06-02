@@ -34,7 +34,7 @@ public class Log implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			LogMessage lm = Server.waitOnQueue(queue);
+			LogMessage lm = ServerUtil.waitOnQueue(queue);
 			output("[" + lm.toString() + "]: " + lm.s);
 		}
 	}

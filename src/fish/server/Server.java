@@ -1,13 +1,10 @@
 package fish.server;
 
-import static fish.server.Log.log;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import fish.server.messages.PMConnected;
-import fish.server.messages.SMConnection;
+import fish.server.messages.PlayerMessage;
 import fish.server.messages.ServerMessage;
 import fish.server.playerinterface.PlayerInterface;
 
@@ -60,8 +57,8 @@ public class Server implements Runnable {
 		initServer();
 
 		while (true) {
-			ServerMessage sm = waitOnQueue(sq);
-			if(true) { // FIXME: remove this
+			ServerMessage sm = ServerUtil.waitOnQueue(sq);
+			if (true) { // FIXME: remove this
 				System.out.println("Server received " + sm);
 			}
 
@@ -79,6 +76,16 @@ public class Server implements Runnable {
 		gameC = new GameController();
 
 		switchState(ServerState.PRE_GAME);
+	}
+
+	/**
+	 * Returns the username of the specified player
+	 * 
+	 * @param id The id of the player
+	 * @return The string of the player's username
+	 */
+	public String getUname(int id) {
+		return clients.get(id).getUname();
 	}
 
 	/**
@@ -105,6 +112,15 @@ public class Server implements Runnable {
 	}
 
 	/**
+	 * Send a message to all connected players
+	 * 
+	 * @param pm The message to send
+	 */
+	public void broadcast(PlayerMessage pm) {
+		clients.forEach(pi -> pi.insertMessage(pm));
+	}
+
+	/**
 	 * Asynchronously adds a message to be processed by the server
 	 */
 	public void insertMessage(ServerMessage m) {
@@ -112,34 +128,5 @@ public class Server implements Runnable {
 		synchronized (sq) {
 			sq.notify();
 		}
-	}
-
-	/**
-	 * This should be run in the thread that will be interrupted on new
-	 * messages. No one else should be waiting on this queue.
-	 * 
-	 * @param q The queue to wait on
-	 * @return An object that will be delivered in the queue
-	 */
-	public static <T> T waitOnQueue(ConcurrentLinkedQueue<T> q) {
-		while (q.isEmpty()) {
-			synchronized (q) {
-				try {
-					q.wait();
-				} catch (InterruptedException e) {
-				}
-			}
-		}
-
-		/*
-		 * there are no other consumers of this queue so we can
-		 * safely dequeue
-		 */
-		T t = q.poll();
-		if (t == null) {
-			log("attempted to dequeue waiting queue and found it empty");
-		}
-
-		return t;
 	}
 }

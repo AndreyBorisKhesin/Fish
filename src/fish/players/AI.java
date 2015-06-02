@@ -2,7 +2,7 @@ package fish.players;
 
 import fish.Card;
 import fish.QuantumHand;
-import fish.events.Question;
+import fish.Question;
 
 public class AI extends Player {
 	private QuantumHand[] hands;

@@ -3,6 +3,7 @@ package fish.server.playerinterface;
 import java.util.Random;
 
 import fish.server.Server;
+import fish.server.ServerUtil;
 import fish.server.messages.PMConnected;
 import fish.server.messages.PMPregameUpdate;
 import fish.server.messages.PlayerMessage;
@@ -26,7 +27,7 @@ public class DummyInterface extends PlayerInterface {
 		running = true;
 
 		while (running) {
-			PlayerMessage pm = Server.waitOnQueue(mqueue);
+			PlayerMessage pm = ServerUtil.waitOnQueue(mqueue);
 
 			System.out.println(uname + " received: \n" + pm);
 
