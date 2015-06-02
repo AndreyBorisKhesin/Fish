@@ -1,6 +1,6 @@
 package fish;
 
-import static fish.Util.*;
+import static fish.Util.isZero;
 
 import java.util.HashMap;
 import java.util.Map;

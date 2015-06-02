@@ -38,31 +38,70 @@ public class Server implements Runnable {
 	 */
 	GameController c;
 
+	/**
+	 * The controller currently in control
+	 */
+	private Controller controller;
+
+	/**
+	 * The controllers that are available to switch control to
+	 */
+	private Controller pregameC, gameC;
+
 	public Server() {
 		sq = new ConcurrentLinkedQueue<ServerMessage>();
 		clients = new ArrayList<PlayerInterface>();
-		
+
 		(t = new Thread(this)).start();
 	}
 
 	@Override
 	public void run() {
+		initServer();
+
 		while (true) {
 			ServerMessage sm = waitOnQueue(sq);
-
-			switch (sm.getType()) {
-			case CONNECTION:
-				connection((SMConnection) sm);
-				break;
-			case START_GAME:
-				break;
+			if(true) { // FIXME: remove this
+				System.out.println("Server received " + sm);
 			}
+
+			if (controller == null) {
+				Log.log("server controller is null");
+				continue;
+			}
+
+			controller.handleMessage(sm);
 		}
 	}
 
-	private void connection(SMConnection sm) {
-		clients.add(sm.pi);
-		sm.pi.insertMessage(new PMConnected(clients.size() - 1));
+	private void initServer() {
+		pregameC = new PregameController();
+		gameC = new GameController();
+
+		switchState(ServerState.PRE_GAME);
+	}
+
+	/**
+	 * Indicates that the server should switch to a new state, should be
+	 * called by other controllers
+	 */
+	void switchState(ServerState s) {
+		if (controller != null) {
+			controller.exit();
+		}
+		switch (s) {
+		case PRE_GAME:
+			controller = pregameC;
+			break;
+		case GAME:
+			controller = gameC;
+			break;
+		}
+		controller.enter(this);
+	}
+
+	enum ServerState {
+		PRE_GAME, GAME;
 	}
 
 	/**
@@ -70,7 +109,7 @@ public class Server implements Runnable {
 	 */
 	public void insertMessage(ServerMessage m) {
 		sq.add(m);
-		synchronized(sq) {
+		synchronized (sq) {
 			sq.notify();
 		}
 	}
@@ -84,7 +123,7 @@ public class Server implements Runnable {
 	 */
 	public static <T> T waitOnQueue(ConcurrentLinkedQueue<T> q) {
 		while (q.isEmpty()) {
-			synchronized(q) {
+			synchronized (q) {
 				try {
 					q.wait();
 				} catch (InterruptedException e) {

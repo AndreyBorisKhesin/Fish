@@ -1,7 +1,5 @@
 package fish.server;
 
-import static fish.server.Log.log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import fish.server.playerinterface.PlayerInterface;
  * objects via an interface provided by the server.
  * 
  */
-public class GameController {
+public class GameController implements Controller {
 
 	/**
 	 * The server that the clients are connected to
@@ -46,7 +44,8 @@ public class GameController {
 	 * 
 	 * @param s The server being used for communication with players.
 	 */
-	void startGame(Server s) {
+	@Override
+	public void enter(Server s) {
 		if (!Util.validPlayerNum(s.clients.size()))
 			throw new IllegalArgumentException(
 					"Invalid number of players: "
@@ -78,8 +77,6 @@ public class GameController {
 
 		sendGameState();
 		sendGameStart();
-
-		mainGameLoop();
 	}
 
 	private void dealDeck() {
@@ -102,9 +99,8 @@ public class GameController {
 		}
 
 		for (int i = 0; i < gs.players.size(); i++) {
-			PMGameState pk = new PMGameState(
-					gs.players.get(i).s, gs.declared,
-					others);
+			PMGameState pk = new PMGameState(gs.players.get(i).s,
+					gs.declared, others);
 
 			gs.players.get(i).i.insertMessage(pk);
 		}
@@ -116,16 +112,14 @@ public class GameController {
 		}
 	}
 
-	private void mainGameLoop() {
-		while (gs.running) {
-			ServerMessage sm = Server.waitOnQueue(s.sq);
-
-			processMessage(sm);
-		}
+	@Override
+	public void handleMessage(ServerMessage sm) {
+		// TODO: implement
 	}
 
-	private void processMessage(ServerMessage sm) {
-
+	@Override
+	public void exit() {
+		// TODO: implement
 	}
 
 	private class GameState {

@@ -1,8 +1,11 @@
 package fish;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Data object holding a set of cards.
@@ -94,10 +97,10 @@ public class Hand {
 
 	@Override
 	public String toString() {
-		Set<Card> cards = getCards();
-		StringBuilder sb = new StringBuilder("{");
-		cards.forEach((Card c) -> sb.append(c + ","));
-
-		return sb.toString();
+		return "{" +
+			getCards().stream()
+			.map((Card c) -> c.toString() + ",")
+			.sorted()
+			.reduce("", String::concat) + "}";
 	}
 }

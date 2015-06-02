@@ -19,4 +19,9 @@ public class PMConnected implements PlayerMessage {
 	public PMConnected(int id) {
 		this.id = id;
 	}
+	
+	@Override
+	public String toString() {
+		return "Player Message: CONNECTED\nid: " + id;
+	}
 }

@@ -31,6 +31,11 @@ public class PMGameState implements PlayerMessage {
 	 * The visible state of other players.
 	 */
 	public List<OtherPlayerData> otherplayers;
+	
+	/**
+	 * Whose turn it is
+	 */
+	public int turn;
 
 	public PMGameState(PlayerState pstate,
 			Map<Integer, Integer> tricks,
@@ -71,12 +76,12 @@ public class PMGameState implements PlayerMessage {
 		}
 		{
 			out.add(prepend + "\totherplayers:\n");
-			out.add(prepend + "[\n");
+			out.add(prepend + "\t[\n");
 			for (OtherPlayerData d : otherplayers) {
 				out.addAll(d.stringFormat(depth + 1));
 				out.add(prepend + ",\n");
 			}
-			out.add(prepend + "],\n");
+			out.add(prepend + "\t],\n");
 		}
 		out.add(prepend + "}");
 
