@@ -9,7 +9,7 @@ import fish.server.messages.PMConnected;
 import fish.server.messages.PMPregameUpdate;
 import fish.server.messages.SMConnection;
 import fish.server.messages.SMReady;
-import fish.server.messages.SMStartGame;
+import fish.server.messages.MStartGame;
 import fish.server.messages.ServerMessage;
 import fish.server.playerinterface.PlayerInterface;
 
@@ -31,7 +31,7 @@ public class PregameController implements Controller {
 
 	@Override
 	public void handleMessage(ServerMessage sm) {
-		switch (sm.getType()) {
+		switch (sm.smType()) {
 		case CONNECTION:
 			connection((SMConnection) sm);
 			break;
@@ -39,7 +39,7 @@ public class PregameController implements Controller {
 			readyUpdate((SMReady) sm);
 			break;
 		case START_GAME:
-			startGame((SMStartGame) sm);
+			startGame((MStartGame) sm);
 			break;
 		}
 	}
@@ -57,17 +57,17 @@ public class PregameController implements Controller {
 		Log.log(s.getUname(sm.id) + " changed ready state: " + sm.ready);
 		sendPregameUpdate();
 	}
-	
-	private void startGame(SMStartGame sm) {
+
+	private void startGame(MStartGame sm) {
 		if (sm.id != 0 || !Util.validPlayerNum(s.clients.size())) {
 			return;
 		}
-		for(Boolean b : readied) {
-			if(!b) {
+		for (Boolean b : readied) {
+			if (!b) {
 				return;
 			}
 		}
-		
+
 		Log.log(s.getUname(0) + " started the game");
 		s.switchState(ServerState.GAME);
 	}

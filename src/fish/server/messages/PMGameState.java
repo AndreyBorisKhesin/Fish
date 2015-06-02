@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import fish.Declaration;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
 
@@ -13,7 +14,7 @@ import fish.server.PlayerState;
 public class PMGameState implements PlayerMessage {
 
 	@Override
-	public PlayerMessage.PMType getType() {
+	public PlayerMessage.PMType pmType() {
 		return PlayerMessage.PMType.GAME_STATE;
 	}
 
@@ -31,7 +32,12 @@ public class PMGameState implements PlayerMessage {
 	 * The visible state of other players.
 	 */
 	public List<OtherPlayerData> otherplayers;
-	
+
+	/**
+	 * The current declaration
+	 */
+	public Declaration dec;
+
 	/**
 	 * Whose turn it is
 	 */
@@ -86,6 +92,9 @@ public class PMGameState implements PlayerMessage {
 		}
 		{
 			out.add(prepend + "\tturn: " + turn + "\n");
+		}
+		{
+			out.add(prepend + "\tdec: " + dec + "\n");
 		}
 		out.add(prepend + "}");
 

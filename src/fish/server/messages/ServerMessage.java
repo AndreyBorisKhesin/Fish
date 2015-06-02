@@ -13,9 +13,9 @@ public interface ServerMessage {
 	 * 
 	 * @return An enum representing the type to be sent
 	 */
-	public SMType getType();
+	public SMType smType();
 
 	public enum SMType {
-		Q_ASKED, DEC_STARTED, DEC_ENDED, CONNECTION, RECONNECTION, END_SERVER, START_GAME, READY_UPDATE;
+		Q_ASKED, DEC_STARTED, DEC_UPDATE, DEC_ENDED, CONNECTION, RECONNECTION, END_SERVER, START_GAME, READY_UPDATE;
 	}
 }

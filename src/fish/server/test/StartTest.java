@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fish.server.Server;
+import fish.server.messages.MStartGame;
 import fish.server.messages.SMReady;
-import fish.server.messages.SMStartGame;
 import fish.server.playerinterface.DummyInterface;
 
 public class StartTest {
@@ -31,7 +31,14 @@ public class StartTest {
 
 			}
 		}
-		
-		s.insertMessage(new SMStartGame(0));
+
+		s.insertMessage(new MStartGame(0));
+		while (true) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+
+			}
+		}
 	}
 }

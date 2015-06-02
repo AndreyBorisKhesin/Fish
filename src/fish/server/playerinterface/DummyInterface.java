@@ -36,7 +36,7 @@ public class DummyInterface extends PlayerInterface {
 				s.insertMessage(new SMReady(id, true));
 			}
 			
-			switch (pm.getType()) {
+			switch (pm.pmType()) {
 			case CONNECTED:
 				connected((PMConnected) pm);
 				break;

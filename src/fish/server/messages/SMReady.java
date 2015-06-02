@@ -18,7 +18,7 @@ public class SMReady implements ServerMessage {
 	}
 
 	@Override
-	public SMType getType() {
+	public SMType smType() {
 		return SMType.READY_UPDATE;
 	}
 

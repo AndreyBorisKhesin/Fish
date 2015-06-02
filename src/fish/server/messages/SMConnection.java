@@ -5,7 +5,7 @@ import fish.server.playerinterface.PlayerInterface;
 public class SMConnection implements ServerMessage {
 
 	@Override
-	public SMType getType() {
+	public SMType smType() {
 		return SMType.CONNECTION;
 	}
 

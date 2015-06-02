@@ -7,7 +7,7 @@ package fish.server.messages;
 public class PMConnected implements PlayerMessage {
 
 	@Override
-	public PMType getType() {
+	public PMType pmType() {
 		return PMType.CONNECTED;
 	}
 

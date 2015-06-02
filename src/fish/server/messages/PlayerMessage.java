@@ -10,10 +10,9 @@ public interface PlayerMessage {
 	 * 
 	 * @return A PMType representing the type
 	 */
-	public PMType getType();
+	public PMType pmType();
 
 	public enum PMType {
-		GAME_STATE, Q_ASKED, DEC_START, DEC_END, GAME_START, CONNECTED, PREGAME_UPDATE;
+		GAME_STATE, Q_ASKED, Q_RESPONSE, DEC_STARTED, DEC_UPDATE, DEC_ENDED, START_GAME, CONNECTED, PREGAME_UPDATE;
 	}
-
 }

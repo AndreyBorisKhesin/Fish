@@ -5,7 +5,7 @@ import java.util.List;
 public class PMPregameUpdate implements PlayerMessage {
 
 	@Override
-	public PMType getType() {
+	public PMType pmType() {
 		return PMType.PREGAME_UPDATE;
 	}
 

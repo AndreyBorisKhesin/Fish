@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import fish.Card;
+import fish.Declaration;
+import fish.Question;
 import fish.Team;
 import fish.Util;
-import fish.events.Event;
-import fish.server.messages.PMGameStart;
+import fish.server.messages.MQuestion;
+import fish.server.messages.MStartGame;
 import fish.server.messages.PMGameState;
+import fish.server.messages.PMResponse;
 import fish.server.messages.ServerMessage;
 import fish.server.playerinterface.PlayerInterface;
 
@@ -62,9 +65,9 @@ public class GameController implements Controller {
 	private void initGame(List<PlayerInterface> inters) {
 		List<Team> teams = new ArrayList<Team>();
 		for (int i = 0; i < inters.size(); i++) {
-			teams.add(i < inters.size() / 2 ? Team.BLK : Team.RED);
+			teams.add(i < inters.size() / 2 ? Team.BLU : Team.RED);
 		}
-		Collections.shuffle(teams);
+		Collections.shuffle(teams, ServerUtil.rand);
 
 		for (int i = 0; i < inters.size(); i++) {
 			gs.players.add(new PlayerContainer(
@@ -75,13 +78,15 @@ public class GameController implements Controller {
 
 		dealDeck();
 
+		gs.turn = ServerUtil.rand.nextInt(s.clients.size());
+
 		sendGameState();
 		sendGameStart();
 	}
 
 	private void dealDeck() {
 		List<Card> deck = Util.deck();
-		Collections.shuffle(deck);
+		Collections.shuffle(deck, ServerUtil.rand);
 		int numplayers = gs.players.size();
 		for (int i = 0; i < deck.size(); i++) {
 			Card c = deck.get(i);
@@ -100,21 +105,102 @@ public class GameController implements Controller {
 
 		for (int i = 0; i < gs.players.size(); i++) {
 			PMGameState pk = new PMGameState(gs.players.get(i).s,
-					gs.declared, others);
+					gs.declared, others, gs.turn);
 
 			gs.players.get(i).i.insertMessage(pk);
 		}
 	}
 
 	private void sendGameStart() {
-		for (PlayerContainer pc : gs.players) {
-			pc.i.insertMessage(new PMGameStart());
-		}
+		s.broadcast(new MStartGame());
 	}
 
 	@Override
 	public void handleMessage(ServerMessage sm) {
-		// TODO: implement
+		switch (sm.smType()) {
+		case Q_ASKED:
+			questionAsked((MQuestion) sm);
+			break;
+		}
+	}
+
+	private void questionAsked(MQuestion sm) {
+		/* make sure it comes from the correct person */
+		if (sm.id != gs.turn)
+			return;
+		/* make sure they're asking the other team */
+		if (gs.players.get(sm.id).s.team == gs.players.get(sm.q.dest).s.team) {
+			return;
+		}
+		/* make sure they are still in the game */
+		if (gs.players.get(sm.q.dest).s.hand.getNumCards() == 0) {
+			return;
+		}
+		/* make sure no one's declaring anything */
+		if (gs.dec != null) {
+			return;
+		}
+		/* first we tell everyone the question was asked */
+		Log.log(s.getUname(sm.id) + " asked " + s.getUname(sm.q.dest)
+				+ " for the " + sm.q.c.humanRep());
+		s.broadcast(sm);
+
+		/* then we wait for a bit */
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		/* now we resolve the question and send the result */
+		Question q = sm.q;
+		boolean res = gs.players.get(q.dest).s.hand.contains(q.c);
+		if (res) {
+			Log.log(s.getUname(sm.q.dest) + " gives the "
+					+ q.c.humanRep() + " to "
+					+ s.getUname(sm.id));
+			gs.players.get(sm.id).s.hand.add(q.c);
+			gs.players.get(q.dest).s.hand.remove(q.c);
+		} else {
+			Log.log(s.getUname(sm.q.dest) + " does not have the "
+					+ q.c.humanRep());
+			gs.turn = q.dest;
+		}
+
+		s.broadcast(new PMResponse(q, res));
+
+		checkEndgameState();
+
+		sendGameState();
+	}
+
+	/**
+	 * Checks if the game has reached the endpoint, i.e. when there is only
+	 * one team remaining
+	 */
+	private void checkEndgameState() {
+		Team remaining = null;
+		for (int i = 0; i < gs.players.size(); i++) {
+			if (gs.players.get(i).s.hand.getNumCards() != 0) {
+				if (remaining == null) {
+					remaining = gs.players.get(i).s.team;
+				} else {
+					if (gs.players.get(i).s.team != remaining) {
+						/*
+						 * players from both teams are
+						 * in, continue
+						 */
+						return;
+					}
+				}
+			}
+		}
+
+		/*
+		 * we only have one team in the game, so no one can ask
+		 * questions
+		 */
+		gs.turn = -1;
 	}
 
 	@Override
@@ -143,6 +229,16 @@ public class GameController implements Controller {
 		private List<PlayerContainer> players;
 
 		/**
+		 * Whose turn it is
+		 */
+		private int turn;
+		
+		/**
+		 * The current declaration
+		 */
+		private Declaration dec;
+		
+		/**
 		 * Indicates whether the game is still running
 		 */
 		private boolean running;
@@ -152,6 +248,8 @@ public class GameController implements Controller {
 			declared = new HashMap<Integer, Integer>();
 			players = new ArrayList<GameController.PlayerContainer>();
 			running = false;
+			turn = 0;
+			dec = null;
 		}
 	}
 
