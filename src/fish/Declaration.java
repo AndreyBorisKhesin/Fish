@@ -18,9 +18,10 @@ public class Declaration {
 	public void updateLocs(int[] locs) {
 		this.locs = locs;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "{source: " + source + ",suit: " + suit + ", locs: " + Arrays.toString(locs) + ",}";
+		return "{source: " + source + ",suit: " + suit + ", locs: "
+				+ Arrays.toString(locs) + ",}";
 	}
 }

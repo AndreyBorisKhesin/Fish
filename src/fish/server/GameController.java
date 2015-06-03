@@ -11,6 +11,8 @@ import fish.Declaration;
 import fish.Question;
 import fish.Team;
 import fish.Util;
+import fish.server.messages.MDecStart;
+import fish.server.messages.MDecUpdate;
 import fish.server.messages.MQuestion;
 import fish.server.messages.MStartGame;
 import fish.server.messages.PMGameState;
@@ -121,6 +123,12 @@ public class GameController implements Controller {
 		case Q_ASKED:
 			questionAsked((MQuestion) sm);
 			break;
+		case DEC_STARTED:
+			decStarted((MDecStart) sm);
+			break;
+		case DEC_UPDATE:
+			decUpdate((MDecUpdate) sm);
+			break;
 		}
 	}
 
@@ -172,6 +180,58 @@ public class GameController implements Controller {
 		checkEndgameState();
 
 		sendGameState();
+	}
+
+	private void decStarted(MDecStart sm) {
+		/* make sure we aren't interrupting another declaration */
+		if (gs.dec != null) {
+			return;
+		}
+		/* make sure the declarer is in the game */
+		if (gs.players.get(sm.id).s.hand.getNumCards() == 0) {
+			return;
+		}
+		/* make sure they aren't trying to cheat someone else */
+		if (sm.id != sm.d.source) {
+			return;
+		}
+
+		gs.dec = sm.d;
+		gs.dec.locs = new int[6];
+		for (int i = 0; i < 6; i++) {
+			gs.dec.locs[i] = -1;
+		}
+
+		s.broadcast(sm);
+	}
+
+	private void decUpdate(MDecUpdate sm) {
+		/* make sure we have a dec that we are updating */
+		if (gs.dec == null) {
+			return;
+		}
+		if (sm.id != gs.dec.source) {
+			return;
+		}
+		if (sm.d.suit != gs.dec.suit) {
+			return;
+		}
+		/* there's nothing to do in this case */
+		if (sm.d.locs == null) {
+			return;
+		}
+
+		boolean dirty = false;
+		for (int i = 0; i < 6; i++) {
+			if (gs.dec.locs[i] == -1 && sm.d.locs[i] != -1) {
+				gs.dec.locs[i] = sm.d.locs[i];
+				dirty = true;
+			}
+		}
+		
+		if(dirty) {
+			s.broadcast(new MDecUpdate(gs.dec));
+		}
 	}
 
 	/**
@@ -232,12 +292,12 @@ public class GameController implements Controller {
 		 * Whose turn it is
 		 */
 		private int turn;
-		
+
 		/**
 		 * The current declaration
 		 */
 		private Declaration dec;
-		
+
 		/**
 		 * Indicates whether the game is still running
 		 */
