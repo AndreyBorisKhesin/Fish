@@ -1,6 +1,7 @@
 package fish.server;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import fish.Declaration;
 import fish.Question;
 import fish.Team;
 import fish.Util;
+import fish.server.messages.MDecEnded;
 import fish.server.messages.MDecStart;
 import fish.server.messages.MDecUpdate;
 import fish.server.messages.MQuestion;
@@ -26,6 +28,8 @@ import fish.server.playerinterface.PlayerInterface;
  * 
  */
 public class GameController implements Controller {
+
+	public static final int RESPONSE_WAIT = 2000;
 
 	/**
 	 * The server that the clients are connected to
@@ -129,19 +133,26 @@ public class GameController implements Controller {
 		case DEC_UPDATE:
 			decUpdate((MDecUpdate) sm);
 			break;
+		case DEC_ENDED:
+			decEnded((MDecEnded) sm);
+			break;
+		default:
+			Log.log("Message invalid for this mode: " + sm);
+			break;
 		}
 	}
 
 	private void questionAsked(MQuestion sm) {
 		/* make sure it comes from the correct person */
-		if (sm.id != gs.turn)
+		if (sm.id != gs.turn) {
 			return;
+		}
 		/* make sure they're asking the other team */
 		if (gs.players.get(sm.id).s.team == gs.players.get(sm.q.dest).s.team) {
 			return;
 		}
-		/* make sure they are still in the game */
-		if (gs.players.get(sm.q.dest).s.hand.getNumCards() == 0) {
+		/* make sure they have a card in the half suit */
+		if(gs.players.get(sm.id).s.hand.getSuit(sm.q.c.suit).size() == 0) {
 			return;
 		}
 		/* make sure no one's declaring anything */
@@ -149,13 +160,14 @@ public class GameController implements Controller {
 			return;
 		}
 		/* first we tell everyone the question was asked */
-		Log.log(s.getUname(sm.id) + " asked " + s.getUname(sm.q.dest)
+		addEvent(s.getUname(sm.id) + " asked " + s.getUname(sm.q.dest)
 				+ " for the " + sm.q.c.humanRep());
+
 		s.broadcast(sm);
 
 		/* then we wait for a bit */
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(RESPONSE_WAIT);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -164,21 +176,20 @@ public class GameController implements Controller {
 		Question q = sm.q;
 		boolean res = gs.players.get(q.dest).s.hand.contains(q.c);
 		if (res) {
-			Log.log(s.getUname(sm.q.dest) + " gives the "
+			addEvent(s.getUname(sm.q.dest) + " gives the "
 					+ q.c.humanRep() + " to "
 					+ s.getUname(sm.id));
 			gs.players.get(sm.id).s.hand.add(q.c);
 			gs.players.get(q.dest).s.hand.remove(q.c);
 		} else {
-			Log.log(s.getUname(sm.q.dest) + " does not have the "
+			addEvent(s.getUname(sm.q.dest) + " does not have the "
 					+ q.c.humanRep());
 			gs.turn = q.dest;
 		}
 
-		s.broadcast(new PMResponse(q, res));
-
 		checkEndgameState();
 
+		s.broadcast(new PMResponse(q, res));
 		sendGameState();
 	}
 
@@ -195,6 +206,9 @@ public class GameController implements Controller {
 		if (sm.id != sm.d.source) {
 			return;
 		}
+
+		addEvent(s.getUname(sm.id) + " started declaring "
+				+ Util.suitHumanRep(sm.d.suit));
 
 		gs.dec = sm.d;
 		gs.dec.locs = new int[6];
@@ -224,14 +238,94 @@ public class GameController implements Controller {
 		boolean dirty = false;
 		for (int i = 0; i < 6; i++) {
 			if (gs.dec.locs[i] == -1 && sm.d.locs[i] != -1) {
+				/* the players must be on the same team */
+				if (gs.players.get(sm.d.locs[i]).s.team != gs.players
+						.get(sm.d.source).s.team) {
+					continue;
+				}
 				gs.dec.locs[i] = sm.d.locs[i];
 				dirty = true;
 			}
 		}
-		
-		if(dirty) {
+
+		if (dirty) {
 			s.broadcast(new MDecUpdate(gs.dec));
+			addEvent(s.getUname(sm.id) + " updated declaration to "
+					+ gs.dec);
 		}
+	}
+
+	private void decEnded(MDecEnded sm) {
+		/* make sure we have a dec that we are ending */
+		if (gs.dec == null) {
+			return;
+		}
+		if (sm.id != gs.dec.source) {
+			return;
+		}
+		if (sm.d.suit != gs.dec.suit) {
+			return;
+		}
+
+		decUpdate(new MDecUpdate(sm.d));
+
+		/* make sure they are all assigned */
+		boolean done = Arrays.stream(gs.dec.locs).boxed()
+				.map(x -> x.intValue() != -1)
+				.reduce(Boolean::logicalAnd).get();
+
+		if (!done) {
+			/* they are not done the declaration */
+			return;
+		}
+
+		/* now we test whether or not they're right */
+		int[] reallocs = new int[6];
+		for (int i = 0; i < 6; i++) {
+			for (int j = 0; j < gs.players.size(); j++) {
+				if (gs.players.get(j).s.hand.contains(new Card(
+						sm.d.suit, i))) {
+					reallocs[i] = j;
+					continue;
+				}
+			}
+		}
+
+		boolean correct = true;
+		for (int i = 0; i < 6; i++) {
+			if (gs.dec.locs[i] != reallocs[i]) {
+				correct = false;
+			}
+		}
+
+		if (correct) {
+			gs.declared.put(gs.dec.suit,
+					gs.players.get(gs.dec.source).s.team);
+		} else {
+			gs.declared.put(gs.dec.suit, gs.players
+					.get(gs.dec.source).s.team.other());
+		}
+
+		for (int i = 0; i < 6; i++) {
+			gs.players.get(reallocs[i]).s.hand.remove(new Card(
+					gs.dec.suit, i));
+		}
+
+		checkEndgameState();
+		if (gs.turn != gs.players.size()
+				&& gs.players.get(gs.turn).s.hand.getNumCards() == 0) {
+
+			Team t = gs.players.get(gs.turn).s.team;
+
+			while (gs.players.get(gs.turn).s.team != t
+					|| gs.players.get(gs.turn).s.hand
+							.getNumCards() == 0) {
+				gs.turn++;
+			}
+		}
+
+		s.broadcast(new MDecEnded(gs.dec, reallocs, correct));
+		sendGameState();
 	}
 
 	/**
@@ -260,12 +354,17 @@ public class GameController implements Controller {
 		 * we only have one team in the game, so no one can ask
 		 * questions
 		 */
-		gs.turn = -1;
+		gs.turn = gs.players.size();
 	}
 
 	@Override
 	public void exit() {
 		// TODO: implement
+	}
+
+	private void addEvent(String s) {
+		gs.events.add(new Event(s));
+		Log.log(s);
 	}
 
 	private class GameState {
@@ -281,7 +380,7 @@ public class GameController implements Controller {
 		 * the players
 		 * that declared them
 		 */
-		private Map<Integer, Integer> declared;
+		private Map<Integer, Team> declared;
 
 		/**
 		 * The containers for the players of the games
@@ -305,7 +404,7 @@ public class GameController implements Controller {
 
 		private GameState() {
 			events = new ArrayList<Event>();
-			declared = new HashMap<Integer, Integer>();
+			declared = new HashMap<Integer, Team>();
 			players = new ArrayList<GameController.PlayerContainer>();
 			running = false;
 			turn = 0;

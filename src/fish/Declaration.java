@@ -14,6 +14,11 @@ public class Declaration {
 		this.source = source;
 		this.suit = suit;
 	}
+	
+	public Declaration(int source, int suit, int[] locs) {
+		this(source, suit);
+		updateLocs(locs);
+	}
 
 	public void updateLocs(int[] locs) {
 		this.locs = locs;

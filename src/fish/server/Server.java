@@ -58,9 +58,6 @@ public class Server implements Runnable {
 
 		while (true) {
 			ServerMessage sm = ServerUtil.waitOnQueue(sq);
-			if (true) { // FIXME: remove this
-				System.out.println("Server received " + sm);
-			}
 
 			if (controller == null) {
 				Log.log("server controller is null");

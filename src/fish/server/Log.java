@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Log implements Runnable {
 
 	private static final Log L = new Log();
-	{
+	static {
 		Thread t = new Thread(L);
 		t.setDaemon(true);
 		t.start();
@@ -35,7 +35,7 @@ public class Log implements Runnable {
 	public void run() {
 		while (true) {
 			LogMessage lm = ServerUtil.waitOnQueue(queue);
-			output("[" + lm.toString() + "]: " + lm.s);
+			output("[" + lm.t.toString() + "]: " + lm.s);
 		}
 	}
 

@@ -42,6 +42,10 @@ public class MDecEnded implements PlayerMessage, ServerMessage {
 		this.succeeded = succeeded;
 		this.id = d.source;
 	}
+	
+	public MDecEnded(Declaration d) {
+		this(d, null, false);
+	}
 
 	@Override
 	public String toString() {

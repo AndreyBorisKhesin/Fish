@@ -39,4 +39,13 @@ public class Util {
 		}
 		return deck;
 	}
+
+	/**
+	 * Returns the human representation of a given suit
+	 */
+	public static String suitHumanRep(int suit) {
+		final String suits[] = { "Clubs", "Diamonds", "Hearts",
+				"Spades" };
+		return suit % 2 == 0 ? "Low " : "High " + suits[suit / 2];
+	}
 }

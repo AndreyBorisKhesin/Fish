@@ -25,6 +25,18 @@ public enum Team {
 		}
 	}
 
+	public Team other() {
+		switch (this) {
+		case RED:
+			return BLU;
+		case BLU:
+			return RED;
+		default:
+			throw new RuntimeException(
+					"TEAM ENUM NOT MATCHING EITHER VALUE");
+		}
+	}
+
 	@Override
 	public String toString() {
 		switch (this) {

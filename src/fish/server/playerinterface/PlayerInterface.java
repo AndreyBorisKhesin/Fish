@@ -2,8 +2,15 @@ package fish.server.playerinterface;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import fish.Declaration;
+import fish.Question;
 import fish.server.GameController;
 import fish.server.Server;
+import fish.server.ServerUtil;
+import fish.server.messages.MDecEnded;
+import fish.server.messages.MDecStart;
+import fish.server.messages.MDecUpdate;
+import fish.server.messages.MQuestion;
 import fish.server.messages.PlayerMessage;
 
 /**
@@ -55,6 +62,22 @@ public abstract class PlayerInterface implements Runnable {
 		t.start();
 	}
 
+	@Override
+	public void run() {
+		while (true) {
+			PlayerMessage pm = ServerUtil.waitOnQueue(this.mqueue);
+
+			processMessage(pm);
+		}
+	}
+
+	/**
+	 * Process the incoming message
+	 * 
+	 * @param pm The message to handle
+	 */
+	protected abstract void processMessage(PlayerMessage pm);
+	
 	/**
 	 * Provides a game controller object for communication with the game
 	 * state.
@@ -91,5 +114,29 @@ public abstract class PlayerInterface implements Runnable {
 	 */
 	public String getUname() {
 		return uname;
+	}
+
+	/**
+	 * Interface to allow the player to ask a question from the server
+	 * 
+	 * @param q The question to send
+	 * 
+	 */
+	public void sendQuestion(Question q) {
+		s.insertMessage(new MQuestion(new Question(id, q.dest, q.c)));
+	}
+
+	public void sendDecStart(Declaration d) {
+		s.insertMessage(new MDecStart(new Declaration(id, d.suit)));
+	}
+
+	public void sendDecUpdate(Declaration d) {
+		s.insertMessage(new MDecUpdate(new Declaration(id, d.suit,
+				d.locs)));
+	}
+
+	public void sendDecEnded(Declaration d) {
+		s.insertMessage(new MDecEnded(new Declaration(id, d.suit,
+				d.locs)));
 	}
 }

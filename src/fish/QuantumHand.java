@@ -67,7 +67,7 @@ public class QuantumHand {
 			for (int i = 0; i < 8; i++) {
 				if (!moved[i]) {
 					int pos = 0;
-					for (Card c : (Card[]) quantumHand[8].keySet().toArray()) {
+					for (Card c : quantumHand[8].keySet()) {
 						if (c.suit == i) {
 							pos++;
 						}

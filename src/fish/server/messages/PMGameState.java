@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import fish.Declaration;
+import fish.Team;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
 
@@ -26,7 +27,7 @@ public class PMGameState implements PlayerMessage {
 	/**
 	 * The tricks taken.
 	 */
-	public Map<Integer, Integer> tricks;
+	public Map<Integer, Team> tricks;
 
 	/**
 	 * The visible state of other players.
@@ -43,7 +44,7 @@ public class PMGameState implements PlayerMessage {
 	 */
 	public int turn;
 
-	public PMGameState(PlayerState pstate, Map<Integer, Integer> tricks,
+	public PMGameState(PlayerState pstate, Map<Integer, Team> tricks,
 			List<OtherPlayerData> otherplayers, int turn) {
 		this.pstate = pstate;
 		this.tricks = tricks;
