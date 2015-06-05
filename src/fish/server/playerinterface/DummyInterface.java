@@ -4,12 +4,14 @@ import fish.server.Server;
 import fish.server.messages.PMConnected;
 import fish.server.messages.PMPregameUpdate;
 import fish.server.messages.PlayerMessage;
+import fish.server.messages.SMConnection;
 
 public class DummyInterface extends PlayerInterface {
 	private static int DIindex = 0;
 
 	public DummyInterface(Server s) {
 		super("DUMMY " + DIindex++, s);
+		s.insertMessage(new SMConnection(this));
 		launch();
 	}
 
