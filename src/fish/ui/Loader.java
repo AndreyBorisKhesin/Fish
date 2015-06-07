@@ -97,8 +97,7 @@ public class Loader extends Thread implements Painter {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
-		g.setColor(new Color(0x00, 0xce, 0xd1));
-		g.fillRect(0, 0, w, h);
+		g.clearRect(w / 2 - size / 2, h / 2 - size / 2, size, size);
 		if (buf != null) {
 			AffineTransform transform = AffineTransform
 					.getTranslateInstance(w / 2 - size / 2,
@@ -126,7 +125,7 @@ public class Loader extends Thread implements Painter {
 		/* runs the loader */
 		while (true) {
 			tick();
-			gui.redraw();
+			gui.repaint();
 			if (Thread.interrupted()) {
 				return;
 			}

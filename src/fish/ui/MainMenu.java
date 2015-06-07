@@ -17,7 +17,7 @@ public class MainMenu implements Painter {
 	public void paintFrame(Graphics2D g, int w, int h) {
 		/* draw the title */
 		{
-			g.setFont(UIUtil.MENU_FONT);
+			g.setFont(Resources.MENU_FONT);
 			FontMetrics fm = g.getFontMetrics();
 			String s = "FI";
 			String e = "SH";

@@ -2,7 +2,6 @@ package fish.ui;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -46,6 +45,8 @@ public class FishGUI extends JPanel {
 		bufg.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
+		bufg.setBackground(new Color(0x00, 0xce, 0xd1));
+
 		painters = new HashMap<GUIMode, Painter>();
 
 		/* placing of things */
@@ -81,8 +82,7 @@ public class FishGUI extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		bufg.setColor(Color.WHITE);
-		bufg.fillRect(0, 0, buf.getWidth(), buf.getHeight());
+		bufg.clearRect(0, 0, buf.getWidth(), buf.getHeight());
 
 		if (painter != null) {
 			painter.paintFrame(bufg, buf.getWidth(),
