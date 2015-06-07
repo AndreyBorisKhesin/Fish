@@ -1,4 +1,4 @@
-package fish.ui;
+package fish.client.ui;
 
 import java.awt.Color;
 import java.awt.Container;

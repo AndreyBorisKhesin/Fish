@@ -1,4 +1,4 @@
-package fish.ui.util;
+package fish.client.ui.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

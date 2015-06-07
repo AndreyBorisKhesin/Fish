@@ -1,4 +1,4 @@
-package fish.ui;
+package fish.client.ui;
 
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -14,7 +14,7 @@ import fish.Util;
  */
 public class Resources {
 
-	public static final Map<Card, BufferedImage> CARDS_IMGS;
+	public static final Map<Card, BufferedImage> CARD_IMGS;
 	public static final BufferedImage CARD_BACK_RED;
 	public static final BufferedImage CARD_BACK_BLU;
 
@@ -24,12 +24,21 @@ public class Resources {
 	public static final Font MENU_OPTION_FONT = MENU_FONT.deriveFont(75f);
 
 	static {
-		CARDS_IMGS = new HashMap<Card, BufferedImage>();
+		CARD_IMGS = new HashMap<Card, BufferedImage>();
 		CARD_BACK_RED = UIUtil.loadImage("resources/cards/br.png");
 		CARD_BACK_BLU = UIUtil.loadImage("resources/cards/bb.png");
-		for(Card c : Util.deck()) {
-			CARDS_IMGS.put(c, UIUtil.loadImage("resources/cards/" + c.suit + "" + c.rank + ".png"));
-		}
 	}
 
+	/**
+	 * Load all the resources
+	 */
+	public static void load() {
+		for (Card c : Util.deck()) {
+			CARD_IMGS.put(c,
+					UIUtil.loadImage("resources/cards/"
+							+ c.suit + "" + c.rank
+							+ ".png"));
+		}
+	}
+	
 }
