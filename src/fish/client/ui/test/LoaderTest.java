@@ -9,7 +9,8 @@ public class LoaderTest {
 		Loader l = new Loader(gui);
 
 		gui.switchMode(l);
+		gui.start();
 
-		l.start();
+		l.go();
 	}
 }

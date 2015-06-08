@@ -49,9 +49,15 @@ public class FishGUI extends JPanel {
 		frame.validate();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
 	}
 
+	/**
+	 * Makes the frame visible
+	 */
+	public void start() {
+		frame.setVisible(true);
+	}
+	
 	public void switchMode(GUIScreen screen) {
 		this.removeMouseListener(guiScreen);
 		this.removeMouseMotionListener(guiScreen);

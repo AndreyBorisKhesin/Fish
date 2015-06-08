@@ -12,10 +12,10 @@ public class GUITest {
 		FishGUI g = new FishGUI();
 		MainMenu menu = new MainMenu(c, g);
 		Loader l = new Loader(g);
-		l.start();
+		l.go();
 		g.switchMode(l);
 		Resources.load();
 		g.switchMode(menu);
-		l.interrupt();
+		l.end();
 	}
 }

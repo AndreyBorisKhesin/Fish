@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  * Displays while cards and other similar things are loading into the game
  *
  */
-public class Loader extends Thread implements GUIScreen {
+public class Loader implements Runnable, GUIScreen {
 
 	private final double INCREMENT = 0.625 * 2;
 	private final int FLIP_INCREMENT = 5 * 2;
@@ -28,6 +28,8 @@ public class Loader extends Thread implements GUIScreen {
 	private BufferedImage buf;
 	private Graphics2D bufg;
 
+	private Thread thread;
+	
 	/**
 	 * Position around the octagon, in degrees
 	 */
@@ -56,6 +58,19 @@ public class Loader extends Thread implements GUIScreen {
 		this.gui = gui;
 	}
 
+	public void go() {
+		if(thread != null) {
+			throw new RuntimeException("Already running loader was told to run");
+		}
+		thread = new Thread(this);
+		thread.start();
+	}
+	
+	public void end() {
+		thread.interrupt();
+		thread = null;
+	}
+	
 	private void drawBuf() {
 		bufg.setTransform(new AffineTransform());
 		bufg.clearRect(0, 0, size, size);
