@@ -25,6 +25,8 @@ public class DummyInterface extends PlayerInterface {
 			break;
 		case PREGAME_UPDATE:
 			readyUpdate((PMPregameUpdate) pm);
+		default:
+			break;
 		}
 	}
 

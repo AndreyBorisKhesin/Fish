@@ -16,6 +16,7 @@ public class QuantumHand {
 	 * Elements 0 to 7 are specific suits.
 	 * Element 8 is the generic suit.
 	 */
+	@SuppressWarnings("unchecked")
 	private Map<Card, Double>[] quantumHand = new Map[9];
 
 	/**

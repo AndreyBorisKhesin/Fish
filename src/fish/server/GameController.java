@@ -152,7 +152,7 @@ public class GameController implements Controller {
 			return;
 		}
 		/* make sure they have a card in the half suit */
-		if(gs.players.get(sm.id).s.hand.getSuit(sm.q.c.suit).size() == 0) {
+		if (gs.players.get(sm.id).s.hand.getSuit(sm.q.c.suit).size() == 0) {
 			return;
 		}
 		/* make sure no one's declaring anything */
@@ -397,16 +397,10 @@ public class GameController implements Controller {
 		 */
 		private Declaration dec;
 
-		/**
-		 * Indicates whether the game is still running
-		 */
-		private boolean running;
-
 		private GameState() {
 			events = new ArrayList<Event>();
 			declared = new HashMap<Integer, Team>();
 			players = new ArrayList<GameController.PlayerContainer>();
-			running = false;
 			turn = 0;
 			dec = null;
 		}

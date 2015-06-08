@@ -5,11 +5,11 @@ import java.util.List;
 
 import fish.Util;
 import fish.server.Server.ServerState;
+import fish.server.messages.MStartGame;
 import fish.server.messages.PMConnected;
 import fish.server.messages.PMPregameUpdate;
 import fish.server.messages.SMConnection;
 import fish.server.messages.SMReady;
-import fish.server.messages.MStartGame;
 import fish.server.messages.ServerMessage;
 import fish.server.playerinterface.PlayerInterface;
 
@@ -40,6 +40,9 @@ public class PregameController implements Controller {
 			break;
 		case START_GAME:
 			startGame((MStartGame) sm);
+			break;
+		default:
+			Log.log("Message of unknown type received: " + sm);
 			break;
 		}
 	}

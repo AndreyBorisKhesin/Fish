@@ -1,11 +1,8 @@
 package fish;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Data object holding a set of cards.
@@ -19,6 +16,7 @@ public class Hand {
 	/**
 	 * Default hand constructor. Makes an empty hand.
 	 */
+	@SuppressWarnings("unchecked")
 	public Hand() {
 		hand = new Set[8];
 		for (int i = 0; i < 8; i++) {
