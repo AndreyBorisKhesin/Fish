@@ -2,16 +2,42 @@ package fish.client.ui;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.util.List;
 
+import fish.Card;
 import fish.Team;
+import fish.Util;
+import fish.client.ClientMaster;
 
 /**
  * The interface used to allow the player to select game mode, etc.
  *
  */
-public class MainMenu implements Painter {
+public class MainMenu implements GUIScreen {
 
-	int i = 0;
+	private MainMenuButton[] buttons;
+
+	private FishGUI g;
+
+	private List<Card> deck;
+
+	public MainMenu(ClientMaster c, FishGUI g) {
+		initButtons(c);
+		this.g = g;
+		this.deck = Util.deck();
+	}
+
+	private void initButtons(ClientMaster c) {
+		buttons = new MainMenuButton[] {
+				new MainMenuButton(13, 530, "Single Player",
+						c::localGame),
+				new MainMenuButton(440, 530, "Online Game",
+						c::onlineGame),
+				new MainMenuButton(867, 530, "Settings",
+						c::settings) };
+	}
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
@@ -19,17 +45,74 @@ public class MainMenu implements Painter {
 		{
 			g.setFont(Resources.MENU_FONT);
 			FontMetrics fm = g.getFontMetrics();
-			String s = "FI";
-			String e = "SH";
+			String F = "F";
+			String I = "I";
+			String S = "S";
+			String H = "H";
+			/* draw it backward for favourable overlapping */
 			g.setColor(Team.BLU.getColor());
-			g.drawString(s, w / 2 - fm.stringWidth(s + e) / 2,
+			g.drawString(H, w / 2 - fm.stringWidth(F + I + S + H)
+					/ 2 + fm.stringWidth(F + I + S),
 					10 + fm.getAscent());
 			g.setColor(Team.RED.getColor());
-			g.drawString(e,
-					w / 2 - fm.stringWidth(s + e) / 2
-							+ fm.stringWidth(s),
+			g.drawString(S, w / 2 - fm.stringWidth(F + I + S + H)
+					/ 2 + fm.stringWidth(F + I),
 					10 + fm.getAscent());
+			g.setColor(Team.BLU.getColor());
+			g.drawString(I, w / 2 - fm.stringWidth(F + I + S + H)
+					/ 2 + fm.stringWidth(F),
+					10 + fm.getAscent());
+			g.setColor(Team.RED.getColor());
+			g.drawString(F, w / 2 - fm.stringWidth(F + I + S + H)
+					/ 2, 10 + fm.getAscent());
+		}
+		/* draw the buttons */
+		{
+			for (Button b : buttons) {
+				b.draw(g);
+			}
+		}
+		/* draw the deck */
+		{
+			double s = 1;
+			AffineTransform trans = AffineTransform
+					.getScaleInstance(s, s);
+			trans.translate(20, 400);
+			for (int i = 0; i < deck.size(); i++) {
+				g.drawImage(Resources.CARD_IMGS
+						.get(deck.get(i)),
+						trans, null);
+				trans.translate(20, 0);
+			}
 		}
 	}
 
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		for (Button b : buttons) {
+			switch (e.getButton()) {
+			case MouseEvent.BUTTON1:
+				b.mouseLeftClick(x, y, g);
+				break;
+			case MouseEvent.BUTTON2:
+				b.mouseRightClick(x, y, g);
+			}
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
+		for (Button b : buttons) {
+			b.mouseMoved(x, y, g);
+		}
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		mouseMoved(e);
+	}
 }

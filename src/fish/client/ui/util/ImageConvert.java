@@ -8,8 +8,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import fish.Card;
-
 public class ImageConvert {
 	public static void main(String[] args) {
 		for (int i = 1; i <= 52; i++) {
@@ -38,42 +36,41 @@ public class ImageConvert {
 
 			int rank = 5 - ((i - 1) % 28) / 4;
 
-			Card c = new Card(suit, rank);
-
 			BufferedImage bi = null;
 			try {
-				bi = ImageIO.read(new File("resources/cards/" + i
-						+ ".png"));
+				bi = ImageIO.read(new File(
+						"resources/cards/olds/" + i
+								+ ".png"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			transform(bi, suit + "" + rank + ".png");
 		}
-		
-		BufferedImage bi = null;
-		try {
-			bi = ImageIO.read(new File("resources/cards/bb1.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		transform(bi, "bb.png");
-		bi = null;
-		try {
-			bi = ImageIO.read(new File("resources/cards/br1.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		transform(bi, "br.png");
-		
+		/*
+		 * BufferedImage bi = null;
+		 * try {
+		 * bi = ImageIO.read(new File("resources/cards/olds/bb1.png"));
+		 * } catch (IOException e) {
+		 * e.printStackTrace();
+		 * }
+		 * transform(bi, "bb.png");
+		 * bi = null;
+		 * try {
+		 * bi = ImageIO.read(new File("resources/cards/olds/br1.png"));
+		 * } catch (IOException e) {
+		 * e.printStackTrace();
+		 * }
+		 * transform(bi, "br.png");
+		 */
 	}
 
 	public static void transform(BufferedImage bi, String s) {
-		BufferedImage n = new BufferedImage(bi.getWidth() - 3,
-				bi.getHeight() - 2, BufferedImage.TYPE_INT_ARGB);
-		for (int i = 1; i < bi.getWidth() - 2; i++) {
-			for (int j = 1; j < bi.getHeight() - 1; j++) {
-				n.setRGB(i - 1, j - 1, bi.getRGB(i, j));
+		BufferedImage n = new BufferedImage(bi.getWidth() - 1,
+				bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		for (int i = 0; i < bi.getWidth() - 1; i++) {
+			for (int j = 0; j < bi.getHeight(); j++) {
+				n.setRGB(i, j, bi.getRGB(i, j));
 			}
 		}
 

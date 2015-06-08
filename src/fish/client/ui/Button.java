@@ -12,20 +12,18 @@ public interface Button {
 
 	public int getHeight();
 
-	public void mouseMoved(int x, int y);
+	public void mouseMoved(int x, int y, FishGUI g);
 
-	public void mouseLeftClick(int x, int y);
+	public void mouseLeftClick(int x, int y, FishGUI g);
 
-	public void mouseRightClick(int x, int y);
+	public void mouseRightClick(int x, int y, FishGUI g);
 
 	/**
 	 * Draw the button graphics
 	 * 
 	 * @param g The graphics to draw it to
-	 * @param x The x location to draw at
-	 * @param y The y location to draw at
 	 */
-	public void draw(Graphics g, int x, int y);
+	public void draw(Graphics g);
 
 	public interface ButtonAction {
 		public void clicked();

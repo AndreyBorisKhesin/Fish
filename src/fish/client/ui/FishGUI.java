@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,9 +20,7 @@ public class FishGUI extends JPanel {
 
 	private BufferedImage buf;
 	private Graphics2D bufg;
-	public Painter painter;
-
-	private Map<GUIMode, Painter> painters;
+	public GUIScreen guiScreen;
 
 	public FishGUI() {
 		frame = new JFrame("Fish");
@@ -47,8 +43,6 @@ public class FishGUI extends JPanel {
 
 		bufg.setBackground(new Color(0x00, 0xce, 0xd1));
 
-		painters = new HashMap<GUIMode, Painter>();
-
 		/* placing of things */
 		cpane.setLayout(null);
 		frame.repaint();
@@ -58,21 +52,16 @@ public class FishGUI extends JPanel {
 		frame.setVisible(true);
 	}
 
-	public void addPainter(GUIMode mode, Painter p) {
-		painters.put(mode, p);
-	}
-
-	public void switchMode(GUIMode mode) {
-		painter = painters.get(mode);
-	}
-
-	public enum GUIMode {
-		LOADER, MENU, GAME, SETTINGS;
+	public void switchMode(GUIScreen screen) {
+		this.removeMouseListener(guiScreen);
+		this.removeMouseMotionListener(guiScreen);
+		guiScreen = screen;
+		this.addMouseListener(guiScreen);
+		this.addMouseMotionListener(guiScreen);
+		this.repaint();
 	}
 
 	public void setSize(Resolution r) {
-		// TODO Auto-generated method stub
-
 		size = r;
 		cpane.setSize(r.d);
 		cpane.setPreferredSize(r.d);
@@ -84,8 +73,8 @@ public class FishGUI extends JPanel {
 	public void paintComponent(Graphics g) {
 		bufg.clearRect(0, 0, buf.getWidth(), buf.getHeight());
 
-		if (painter != null) {
-			painter.paintFrame(bufg, buf.getWidth(),
+		if (guiScreen != null) {
+			guiScreen.paintFrame(bufg, buf.getWidth(),
 					buf.getHeight());
 		}
 

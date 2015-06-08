@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  * Displays while cards and other similar things are loading into the game
  *
  */
-public class Loader extends Thread implements Painter {
+public class Loader extends Thread implements GUIScreen {
 
 	private final double INCREMENT = 0.625 * 2;
 	private final int FLIP_INCREMENT = 5 * 2;
