@@ -31,12 +31,13 @@ public class MainMenu implements GUIScreen {
 
 	private void initButtons(ClientMaster c) {
 		buttons = new MainMenuButton[] {
-				new MainMenuButton(13, 530, "Single Player",
+				new MainMenuButton(20, 530, "Single Player",
 						c::localGame),
-				new MainMenuButton(440, 530, "Online Game",
+				new MainMenuButton(335, 530, "Online Game",
 						c::onlineGame),
-				new MainMenuButton(867, 530, "Settings",
-						c::settings) };
+				new MainMenuButton(650, 530, "Settings",
+						c::settings),
+				new MainMenuButton(965, 530, "Quit", c::quit) };
 	}
 
 	@Override
@@ -74,15 +75,15 @@ public class MainMenu implements GUIScreen {
 		}
 		/* draw the deck */
 		{
-			double s = 1;
-			AffineTransform trans = AffineTransform
-					.getScaleInstance(s, s);
-			trans.translate(20, 400);
+			double s = 1.9;
+			AffineTransform trans = new AffineTransform();
+			trans.translate(36, 250);
+			trans.scale(s, s);
 			for (int i = 0; i < deck.size(); i++) {
 				g.drawImage(Resources.CARD_IMGS
 						.get(deck.get(i)),
 						trans, null);
-				trans.translate(20, 0);
+				trans.translate(12, 0);
 			}
 		}
 	}

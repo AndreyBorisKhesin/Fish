@@ -21,7 +21,7 @@ public class Resources {
 	private static final String FONT_LOC = "resources/gecko.ttf";
 	public static final Font MENU_FONT = UIUtil.loadFont(FONT_LOC)
 			.deriveFont(200f);
-	public static final Font MENU_OPTION_FONT = MENU_FONT.deriveFont(50f);
+	public static final Font MENU_OPTION_FONT = MENU_FONT.deriveFont(45f);
 
 	static {
 		CARD_IMGS = new HashMap<Card, BufferedImage>();

@@ -51,8 +51,13 @@ public class ClientMaster {
 	public void onlineGame() {
 		System.out.println("Online game started");
 	}
-	
+
 	public void settings() {
 		System.out.println("Settings opened");
+	}
+	
+	public void quit() {
+		System.out.println("Qutting");
+		System.exit(0);
 	}
 }

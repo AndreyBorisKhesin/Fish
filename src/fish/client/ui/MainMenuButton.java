@@ -32,7 +32,7 @@ public class MainMenuButton implements Button {
 		this.action = action;
 		this.xp = x;
 		this.yp = y;
-		this.w = 400;
+		this.w = 295;
 		this.h = 150;
 		this.moused = false;
 	}
