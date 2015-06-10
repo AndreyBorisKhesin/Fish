@@ -1,9 +1,11 @@
-package fish.client.ui;
+package fish.client.ui.screens;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+
+import fish.client.ui.FishGUI;
 
 /**
  * Displays while cards and other similar things are loading into the game

@@ -5,9 +5,11 @@ import fish.server.Server;
 import fish.server.messages.MDecStart;
 import fish.server.messages.MDecUpdate;
 import fish.server.messages.MQuestion;
+import fish.server.messages.PMConnected;
 import fish.server.messages.PMGameState;
 import fish.server.messages.PMResponse;
 import fish.server.messages.PlayerMessage;
+import fish.server.messages.SMReady;
 
 /**
  * A player interface for a player connected locally. It is passed a player
@@ -31,6 +33,9 @@ public class LocalInterface extends PlayerInterface {
 		super(p.getName(), s);
 
 		this.p = p;
+		p.setPlayerInterface(this);
+
+		launch();
 	}
 
 	protected void processMessage(PlayerMessage pm) {
@@ -56,8 +61,13 @@ public class LocalInterface extends PlayerInterface {
 			p.updateGameState(gs.pstate, gs.otherplayers,
 					gs.tricks, gs.turn, gs.dec);
 			break;
+		case CONNECTED:
+			this.id = ((PMConnected) pm).id;
+			p.connected();
+			break;
 		default:
-			System.out.println("Unsupported message received: " + pm);
+			System.out.println("Unsupported message received: "
+					+ pm);
 			break;
 		}
 	}

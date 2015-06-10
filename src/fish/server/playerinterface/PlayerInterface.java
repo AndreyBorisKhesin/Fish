@@ -12,6 +12,7 @@ import fish.server.messages.MDecStart;
 import fish.server.messages.MDecUpdate;
 import fish.server.messages.MQuestion;
 import fish.server.messages.PlayerMessage;
+import fish.server.messages.SMReady;
 
 /**
  * An interface to define interactions between the player and server.
@@ -138,5 +139,9 @@ public abstract class PlayerInterface implements Runnable {
 	public void sendDecEnded(Declaration d) {
 		s.insertMessage(new MDecEnded(new Declaration(id, d.suit,
 				d.locs)));
+	}
+	
+	public void ready(boolean val) {
+		s.insertMessage(new SMReady(id, val));
 	}
 }

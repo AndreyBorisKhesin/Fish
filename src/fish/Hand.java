@@ -1,7 +1,10 @@
 package fish;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -64,6 +67,18 @@ public class Hand {
 	}
 
 	/**
+	 * Returns a list of cards in sorted order
+	 * 
+	 * @return A list containing all cards in the hand, in sorted order
+	 */
+	public List<Card> getCardsSorted() {
+		List<Card> cards = new ArrayList<Card>();
+		Arrays.stream(hand).map(cards::addAll);
+		Collections.sort(cards);
+		return cards;
+	}
+
+	/**
 	 * Returns a set containing the cards in the specified suit.
 	 * 
 	 * @param suit The suit identifier to access.
@@ -95,10 +110,11 @@ public class Hand {
 
 	@Override
 	public String toString() {
-		return "{" +
-			getCards().stream()
-			.map((Card c) -> c.toString() + ",")
-			.sorted()
-			.reduce("", String::concat) + "}";
+		return "{"
+				+ getCards().stream()
+						.map((Card c) -> c.toString()
+								+ ",").sorted()
+						.reduce("", String::concat)
+				+ "}";
 	}
 }

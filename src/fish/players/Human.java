@@ -6,6 +6,7 @@ import java.util.Map;
 import fish.Declaration;
 import fish.Question;
 import fish.Team;
+import fish.client.ui.screens.GameGUI;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
 
@@ -14,42 +15,77 @@ import fish.server.PlayerState;
  */
 public class Human extends Player {
 
+	private GameGUI gui;
+
+	public Human(GameGUI gui, String name) {
+		this.gui = gui;
+		this.name = name;
+	}
+
 	@Override
 	public void updateGameState(PlayerState p,
 			List<OtherPlayerData> others,
 			Map<Integer, Team> tricks, int turn, Declaration dec) {
-		// TODO implement
+		this.hand = p.hand;
+		this.team = p.team;
+		this.id = p.id;
+		this.tricks = tricks;
+		this.others = others;
+		this.tricks = tricks;
+		this.turn = turn;
+		this.dec = dec;
 
+		gui.updated();
 	}
 
 	@Override
 	public void questionAsked(Question q) {
-		// TODO implement
-
+		// gui.question(q);
 	}
 
 	@Override
 	public void questionResponse(Question q, boolean works) {
-		// TODO implement
-
+		// gui.response(q, works);
 	}
 
 	@Override
 	public void decStarted(Declaration d) {
-		// TODO implement
-
+		this.dec = d;
+		if (d.source == this.id) {
+			/* this is a different case */
+		} else {
+			/* show the declaration */
+		}
 	}
 
 	@Override
 	public void decUpdated(Declaration d) {
-		// TODO implement
-
+		this.dec = d;
+		if (d.source == this.id) {
+			/*
+			 * this is a different case, we should probably do
+			 * nothing here
+			 */
+		} else {
+			/* update the display of the declaration */
+		}
 	}
 
 	@Override
 	public void decEnded(Declaration d, int[] locs, boolean succeeded) {
-		// TODO implement
+		this.dec = d;
 
+		/*
+		 * we need to temporarily show the declaration before sweeping
+		 * it away
+		 */
 	}
 
+	/**
+	 * Once this is received we should move on to the ready-ing up screen
+	 */
+	@Override
+	public void connected() {
+
+	}
 }

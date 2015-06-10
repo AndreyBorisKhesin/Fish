@@ -1,23 +1,30 @@
-package fish.client.ui;
+package fish.client.ui.elements;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
+import fish.client.ui.FishGUI;
+import fish.client.ui.Resources;
+
+
 /**
- * Buttons found on the main menu
+ * An interface for clickable buttons
  *
  */
-public class MainMenuButton implements Button {
+public class Button implements UIElement {
 
 	private String s;
-	private ButtonAction action;
+	private UIClick action;
 
 	private int xp, yp;
 	private int w, h;
 
 	boolean moused;
 
+	private Font f;
+	
 	/**
 	 * Creates a new menu button out of the string to show, and what to do
 	 * when it is pressed
@@ -27,22 +34,21 @@ public class MainMenuButton implements Button {
 	 * @param s The string to display on this button
 	 * @param clicked The action to perform when clicked
 	 */
-	public MainMenuButton(int x, int y, String s, ButtonAction action) {
+	public Button(int x, int y, int w, int h, String s, Font f, UIClick action) {
 		this.s = s;
 		this.action = action;
 		this.xp = x;
 		this.yp = y;
-		this.w = 295;
-		this.h = 150;
+		this.w = w;
+		this.h = h;
+		this.f = f;
 		this.moused = false;
 	}
 
-	@Override
 	public int getWidth() {
 		return w;
 	}
 
-	@Override
 	public int getHeight() {
 		return h;
 	}
@@ -78,10 +84,9 @@ public class MainMenuButton implements Button {
 		g.setColor(moused ? Color.ORANGE : Color.GREEN);
 		g.fillRoundRect(xp + 10, yp + 10, w - 20, h - 20, 20, 20);
 		g.setColor(Color.BLACK);
-		g.setFont(Resources.MENU_OPTION_FONT);
+		g.setFont(f);
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(s, xp + w / 2 - fm.stringWidth(s) / 2, yp + h / 2
 				+ fm.getAscent() / 2);
 	}
-
 }
