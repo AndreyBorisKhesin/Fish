@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import fish.client.ui.screens.GUIScreen;
+
 @SuppressWarnings("serial")
 public class FishGUI extends JPanel {
 	private JFrame frame;

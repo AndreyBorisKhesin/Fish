@@ -1,16 +1,10 @@
-package fish.client.ui;
+package fish.client.ui.elements;
 
 import java.awt.Graphics;
 
-/**
- * An interface for clickable buttons
- *
- */
-public interface Button {
+import fish.client.ui.FishGUI;
 
-	public int getWidth();
-
-	public int getHeight();
+public interface UIElement {
 
 	public void mouseMoved(int x, int y, FishGUI g);
 
@@ -24,8 +18,4 @@ public interface Button {
 	 * @param g The graphics to draw it to
 	 */
 	public void draw(Graphics g);
-
-	public interface ButtonAction {
-		public void clicked();
-	}
 }

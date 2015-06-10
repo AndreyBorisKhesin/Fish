@@ -1,4 +1,4 @@
-package fish.client.ui;
+package fish.client.ui.screens;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -10,6 +10,10 @@ import fish.Card;
 import fish.Team;
 import fish.Util;
 import fish.client.ClientMaster;
+import fish.client.ui.FishGUI;
+import fish.client.ui.Resources;
+import fish.client.ui.elements.Button;
+import fish.client.ui.elements.MainMenuButton;
 
 /**
  * The interface used to allow the player to select game mode, etc.
@@ -89,7 +93,7 @@ public class MainMenu implements GUIScreen {
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
+	public void mousePressed(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
 		for (Button b : buttons) {
@@ -99,6 +103,7 @@ public class MainMenu implements GUIScreen {
 				break;
 			case MouseEvent.BUTTON2:
 				b.mouseRightClick(x, y, g);
+				break;
 			}
 		}
 	}

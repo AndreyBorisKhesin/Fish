@@ -6,8 +6,17 @@ import java.util.Map;
 import fish.*;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
+import fish.server.playerinterface.PlayerInterface;
 
 public class AI extends Player {
+	private static int nameCounter = 0;
+
+	public AI() {
+		synchronized (AI.class) {
+			this.name = "AI#" + ++nameCounter;
+		}
+	}
+
 	private QuantumHand[] hands;
 
 	public void questionResponse(Question q, boolean ans) {
@@ -104,5 +113,12 @@ public class AI extends Player {
 	public void decEnded(Declaration d, int[] locs, boolean succeeded) {
 		// TODO implement
 
+	}
+
+	/**
+	 * Allow the clientmaster to ready us up
+	 */
+	@Override
+	public void connected() {
 	}
 }

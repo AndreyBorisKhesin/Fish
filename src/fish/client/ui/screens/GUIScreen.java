@@ -1,4 +1,4 @@
-package fish.client.ui;
+package fish.client.ui.screens;
 
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;

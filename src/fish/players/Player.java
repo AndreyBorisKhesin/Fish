@@ -10,23 +10,36 @@ import fish.Question;
 import fish.Team;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
+import fish.server.playerinterface.PlayerInterface;
 
 /**
  * An interface for all Humans and AI's playing the game.
  */
 public abstract class Player {
-	protected Hand hand;
+	public Hand hand;
 
-	protected Team team;
+	public Team team;
 
-	protected String name;
+	public String name;
 
-	protected int id;
+	public int id;
 
-	protected Set<Integer> tricks;
+	public Map<Integer, Team> tricks;
+
+	public List<OtherPlayerData> others;
+	
+	public int turn;
+	
+	public Declaration dec;
+
+	protected PlayerInterface pi;
 
 	public String getName() {
 		return name;
+	}
+
+	public void setPlayerInterface(PlayerInterface pi) {
+		this.pi = pi;
 	}
 
 	public abstract void updateGameState(PlayerState p,
@@ -43,4 +56,6 @@ public abstract class Player {
 
 	public abstract void decEnded(Declaration d, int[] locs,
 			boolean succeeded);
+
+	public abstract void connected();
 }

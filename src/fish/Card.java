@@ -3,7 +3,7 @@ package fish;
 /**
  * A class that represents a Card that holds a suit and a rank.
  */
-public class Card {
+public class Card implements Comparable<Card> {
 
 	/**
 	 * Rank of suit from 0 to 7.
@@ -108,5 +108,10 @@ public class Card {
 				{ "Nine", "Ten", "Jack", "Queen", "King", "Ace" } };
 
 		return ranks[suit % 2][rank] + " of " + suits[suit / 2];
+	}
+
+	@Override
+	public int compareTo(Card o) {
+		return Integer.compare(this.hashCode(), o.hashCode());
 	}
 }
