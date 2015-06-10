@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * General class for utility variables and methods.
  */
-public class Util {
+public final class Util {
 
 	/**
 	 * Determines if a given number is a valid number of players.

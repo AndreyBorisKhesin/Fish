@@ -4,7 +4,7 @@ package fish;
 /**
  * A data object representing a query from one player to another.
  */
-public class Question {
+public final class Question {
 
 	/**
 	 * The person asking the question.

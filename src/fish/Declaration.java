@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * A data object representing a player's declaration
  */
-public class Declaration {
+public final class Declaration {
 	public final int source;
 	public final int suit;
 	public int[] locs;

@@ -37,7 +37,7 @@ public class Card {
 	 */
 	public Card(int suit, int rank) {
 		if (suit < 0 || suit > 7 || rank < 0 || rank > 5) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Card value is out of bounds.");
 		}
 		this.suit = suit;
 		this.rank = rank;

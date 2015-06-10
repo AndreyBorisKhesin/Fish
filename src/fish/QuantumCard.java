@@ -20,7 +20,8 @@ public class QuantumCard extends Card {
 	public QuantumCard(int suit, int rank, double prob) {
 		super(suit, rank);
 		if (prob < 0 || prob > 1) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException
+					("Probability value is out of bounds.");
 		}
 		this.prob = prob;
 	}
