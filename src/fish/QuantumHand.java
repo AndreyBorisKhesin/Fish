@@ -96,23 +96,17 @@ public class QuantumHand {
 						b = true;
 					}
 				}
-				if (moved[i] && quantumHand[i].size() > 0) {
-					double sum = quantumHand[i].values().stream().reduce(0d,
-							Double::sum);
-					double ratio = quantumHand[i].size() / sum;
-					final int j = i;
-					quantumHand[i].entrySet().forEach((Map.Entry<Card,
-							Double> e) -> quantumHand[j].put(e.getKey(),
-							e.getValue() * ratio));
-					b |= !isZero(ratio - 1);
+			}
+			for (int i = 0; i < 48; i++) {
+				Card c = new Card(i);
+				if (quantumHand[8].containsKey(c)
+						&& isZero(quantumHand[8].get(c) - 1)) {
+					quantumHand[8].remove(c);
+					hand.add(c);
+					bounds[8][0]--;
+					bounds[8][1]--;
 				}
 			}
-			double sum = quantumHand[8].values().stream().reduce(0d,
-					Double::sum);
-			double ratio = quantumHand[8].size() / sum;
-			quantumHand[8].entrySet().forEach((Map.Entry<Card, Double> e) ->
-					quantumHand[8].put(e.getKey(), e.getValue() * ratio));
-			b |= !isZero(ratio - 1);
 		}
 	}
 
