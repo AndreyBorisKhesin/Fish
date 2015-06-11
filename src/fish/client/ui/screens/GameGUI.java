@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.font.TextLayout;
@@ -24,8 +25,16 @@ public class GameGUI implements GUIScreen {
 
 	private Human p;
 
+	private DrawMode mode;
+
+	private static enum DrawMode {
+		WAIT_FOR_Q, DECLARATION, QUESTION
+	}
+
 	public GameGUI(FishGUI gui) {
 		this.gui = gui;
+
+		mode = DrawMode.WAIT_FOR_Q;
 	}
 
 	/**
@@ -62,6 +71,15 @@ public class GameGUI implements GUIScreen {
 
 			int handheight = (int) ((96 / 2) * cardScale);
 
+			/* if it is your turn draw an outline around your hand */
+			if (p.turn == p.id) {
+				g.setColor(Resources.GLOW);
+				g.fillRoundRect(gameWidth / 2 - handwidth / 2
+						- 40, h - handheight - 40,
+						handwidth + 40 * 2,
+						handheight + 40 * 2, 20, 20);
+			}
+
 			/* draw an outline around the cards */
 			g.setColor(p.team.getColor());
 			g.fillRoundRect(gameWidth / 2 - handwidth / 2 - 20, h
@@ -87,13 +105,21 @@ public class GameGUI implements GUIScreen {
 		table.addAll(p.others);
 		Collections.sort(table,
 				((a, b) -> Integer.compare(a.seat, b.seat)));
+
+		Layout turnLayout = null;
 		/* draw opponents, cycling around from our seat */
 		/* lidx represents position in the layout list */
 		for (int i = (p.seat + 1) % table.size(), lidx = 0; i != p.seat; i = (i + 1)
 				% table.size(), lidx++) {
 			OtherPlayerData d = table.get(i);
 			Layout l = getLayoutSet(table.size())[lidx];
+
 			double scale = getLayoutScale(table.size());
+
+			/* assign the turn seat */
+			if (d.id == p.turn) {
+				turnLayout = l;
+			}
 
 			int x = (int) (l.x * gameWidth);
 			int y = (int) (l.y * h);
@@ -110,8 +136,17 @@ public class GameGUI implements GUIScreen {
 				/* translate to centre of card */
 				xform.translate(-71 / 2, -96 / 2);
 
-				g.drawImage(Resources.CARD_BACKS.get(d.t),
-						xform, null);
+				g.setTransform(xform);
+				if (d.id == p.turn) {
+					g.setColor(Resources.GLOW);
+					g.fillRoundRect(-10,
+							-10,
+							71 + 10 * 2,
+							96 + 10 * 2, 10, 10);
+				}
+				g.drawImage(Resources.CARD_BACKS.get(d.t), 0,
+						0, null);
+				g.setTransform(new AffineTransform());
 			}
 			/* draw the number on the card */
 			{
@@ -190,6 +225,31 @@ public class GameGUI implements GUIScreen {
 				g.drawString(d.uname, 0, 0);
 				g.setTransform(new AffineTransform());
 			}
+		}
+
+		/* draw the turn arrow */
+		if (mode == DrawMode.WAIT_FOR_Q) {
+			Polygon a = new Polygon(new int[] { -1, 1, 1, 2, 0, -2,
+					-1 },
+					new int[] { -1, -1, 1, 1, 3, 1, 1 }, 7);
+			g.setColor(new Color(0, 0, 0, 128));
+
+			AffineTransform xform = new AffineTransform();
+			xform.translate(gameWidth / 2, h / 2);
+
+			Layout l = turnLayout;
+			if (l != null) {
+				xform.rotate((l.x - 0.5) * gameWidth,
+						-(0.5 - l.y) * h, 0, 0);
+			} else {
+				xform.rotate(0, 0.5, 0, 0);
+			}
+			xform.quadrantRotate(-1);
+			xform.scale(20, 20);
+
+			g.setTransform(xform);
+			g.fill(a);
+			g.setTransform(new AffineTransform());
 		}
 
 		g.clearRect(gameWidth, 0, w - gameWidth, h);

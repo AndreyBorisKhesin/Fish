@@ -1,5 +1,6 @@
 package fish.client.ui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -30,7 +31,9 @@ public class Resources {
 	public static final Font RADIO_BUTTON_FONT = MENU_FONT.deriveFont(25f);
 
 	public static final Font GAME_FONT = MENU_FONT.deriveFont(20f);
-	
+
+	public static final Color GLOW = new Color(255, 215, 0);
+
 	/**
 	 * Load all the resources
 	 */
@@ -42,8 +45,10 @@ public class Resources {
 							+ c.suit + "" + c.rank
 							+ ".png"));
 		}
-		CARD_BACKS.put(Team.BLU, UIUtil.loadImage("resources/cards/bb.png"));
-		CARD_BACKS.put(Team.RED, UIUtil.loadImage("resources/cards/br.png"));
+		CARD_BACKS.put(Team.BLU,
+				UIUtil.loadImage("resources/cards/bb.png"));
+		CARD_BACKS.put(Team.RED,
+				UIUtil.loadImage("resources/cards/br.png"));
 	}
 
 }
