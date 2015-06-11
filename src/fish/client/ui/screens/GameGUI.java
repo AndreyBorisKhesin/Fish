@@ -41,7 +41,7 @@ public class GameGUI implements GUIScreen {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
-		w = w - 300;
+		int gameWidth = w - 250;
 
 		/* if the player is null or the hand is null we aren't ready yet */
 		if (p == null || p.hand == null) {
@@ -55,7 +55,7 @@ public class GameGUI implements GUIScreen {
 			int handwidth = (int) (((p.hand.getNumCards() - 1) * 12 + 71) * cardScale);
 			AffineTransform transform = new AffineTransform();
 
-			transform.translate(w / 2 - handwidth / 2, h);
+			transform.translate(gameWidth / 2 - handwidth / 2, h);
 			transform.scale(cardScale, cardScale);
 			/* the size of the cards in pixels */
 			transform.translate(0, -96 / 2);
@@ -64,7 +64,7 @@ public class GameGUI implements GUIScreen {
 
 			/* draw an outline around the cards */
 			g.setColor(p.team.getColor());
-			g.fillRoundRect(w / 2 - handwidth / 2 - 20, h
+			g.fillRoundRect(gameWidth / 2 - handwidth / 2 - 20, h
 					- handheight - 20, handwidth + 20 * 2,
 					handheight + 20 * 2, 20, 20);
 
@@ -78,7 +78,7 @@ public class GameGUI implements GUIScreen {
 			g.setFont(Resources.GAME_FONT.deriveFont(40f));
 			FontMetrics fm = g.getFontMetrics();
 			g.setColor(Color.BLACK);
-			g.drawString(p.name, w / 2 - handwidth / 2, h
+			g.drawString(p.name, gameWidth / 2 - handwidth / 2, h
 					- handheight - 20 - fm.getDescent() + 1);
 		}
 
@@ -95,7 +95,7 @@ public class GameGUI implements GUIScreen {
 			Layout l = getLayoutSet(table.size())[lidx];
 			double scale = getLayoutScale(table.size());
 
-			int x = (int) (l.x * w);
+			int x = (int) (l.x * gameWidth);
 			int y = (int) (l.y * h);
 
 			/* draw the card */
@@ -117,7 +117,8 @@ public class GameGUI implements GUIScreen {
 			{
 				TextLayout num = new TextLayout(
 						"" + d.numCards,
-						Resources.GAME_FONT.deriveFont(40f),
+						Resources.GAME_FONT
+								.deriveFont(40f),
 						g.getFontRenderContext());
 
 				Shape s = num.getOutline(AffineTransform
@@ -126,23 +127,27 @@ public class GameGUI implements GUIScreen {
 				Stroke orig = g.getStroke();
 				g.setStroke(new BasicStroke(2));
 
-				
 				AffineTransform xform = AffineTransform
 						.getTranslateInstance(x, y);
-				switch(l.rot) {
+				switch (l.rot) {
 				case 1:
-					xform.translate((int) (22 * scale), 0);
+					xform.translate((int) (20 * scale), -5);
 					break;
 				case 2:
-					xform.translate(0, (int) (22 * scale));
+					xform.translate(0, (int) (20 * scale));
 					break;
 				case 3:
-					xform.translate((int) (-22 * scale), 0);
+					xform.translate((int) (-20 * scale), -5);
 					break;
 				}
 				/* translate by the font size */
-				FontMetrics fm = g.getFontMetrics(Resources.GAME_FONT.deriveFont(40f));
-				xform.translate(scale * (- fm.stringWidth("" + d.numCards) / 2), scale * (fm.getAscent() / 2));
+				FontMetrics fm = g
+						.getFontMetrics(Resources.GAME_FONT
+								.deriveFont(40f));
+				xform.translate(scale
+						* (-fm.stringWidth(""
+								+ d.numCards) / 2),
+						scale * (fm.getAscent() / 2));
 				g.setTransform(xform);
 				g.setColor(Color.WHITE);
 				g.fill(s);
@@ -152,9 +157,42 @@ public class GameGUI implements GUIScreen {
 
 				g.setStroke(orig);
 			}
+			/* draw the name of the player */
+			{
+				g.setFont(Resources.GAME_FONT);
+				g.setColor(Color.BLACK);
+				FontMetrics fm = g.getFontMetrics();
+
+				AffineTransform xform = AffineTransform
+						.getTranslateInstance(x, y);
+				xform.scale(scale, scale);
+
+				int tx = 0;
+				int ty = 0;
+				switch (l.rot) {
+				case 1:
+					tx = 1;
+					ty = -37;
+					break;
+				case 2:
+					tx = -36;
+					ty = 48 + fm.getAscent();
+					break;
+				case 3:
+					tx = -48;
+					ty = -36;
+					break;
+				}
+
+				xform.translate(tx, ty);
+
+				g.setTransform(xform);
+				g.drawString(d.uname, 0, 0);
+				g.setTransform(new AffineTransform());
+			}
 		}
 
-		g.clearRect(w, 0, 300, h);
+		g.clearRect(gameWidth, 0, w - gameWidth, h);
 	}
 
 	public void updated() {
