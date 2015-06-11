@@ -11,13 +11,11 @@ import static fish.Util.isZero;
 public class AI extends Player {
 	private static int nameCounter = 0;
 
-	public AI() {
+	public AI(String s) {
 		/*FIXME need an argument for number of players
 		hands = new QuantumHand[THAT NUMBER];
 		hands[id] = new QuantumHand(hand);*/
-		synchronized (AI.class) {
-			this.name = "AI# " + ++nameCounter;
-		}
+		this.name = s;
 	}
 
 	private QuantumHand[] hands;
@@ -222,10 +220,8 @@ public class AI extends Player {
 
 	}
 
-	/**
-	 * Allow the clientmaster to ready us up
-	 */
 	@Override
 	public void connected() {
+		pi.ready(true);
 	}
 }
