@@ -91,9 +91,8 @@ public class AI extends Player {
 		}
 		Matrix matrix = new Matrix(array);
 		for (int i = 0; i < 20; i++) {
-			matrix = matrix.x(Matrix.diagonalReciprocal(matrix.sum(), units));
-			matrix = matrix.t().x
-					(Matrix.diagonalReciprocal(matrix.t().sum())).t();
+			matrix = matrix.diagonalReciprocal(matrix.sum(), units);
+			matrix = matrix.t().diagonalReciprocal(matrix.t().sum()).t();
 		}
 		for (int i = 0; i < hands.length; i++) {
 			for (int j = 0; j < 9; j++) {
@@ -105,9 +104,9 @@ public class AI extends Player {
 					if (j != 8 && !hands[i].getMoved()[new Card(k).suit]) {
 						continue;
 					}
-					if (!isZero(matrix._[9 * i + j][k])) {
+					if (!isZero(matrix.m[9 * i + j][k])) {
 						hands[i].getQuantumHand()[j].put
-								(new Card(k), matrix._[9 * i + j][k]);
+								(new Card(k), matrix.m[9 * i + j][k]);
 					}
 				}
 			}
@@ -122,7 +121,7 @@ public class AI extends Player {
 //			for (int j = 0; j < 9; j++) {
 //				units.add(hands[i].getBounds()[j][0]);
 //			}
-//		}
+// 		}
 //		double[][] array = new double[hands.length][48];
 //		for (int i = 0, j = 0; i < 48; i++) {
 //			if (!known.contains(new Card(i))) {
@@ -138,7 +137,7 @@ public class AI extends Player {
 		adjust bounds
 		update hands to remove cards
 		sum decided cards
-		construct a _ (p * 6 tall) (48 - decided cards wide)
+		construct a m (p * 6 tall) (48 - decided cards wide)
 		apply hocus pocus twice
 		average
 		rebuild all of the quantum hands
