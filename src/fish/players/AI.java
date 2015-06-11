@@ -9,7 +9,11 @@ import fish.server.PlayerState;
 import static fish.Util.isZero;
 
 public class AI extends Player {
+	private QuantumHand[] hands;
+
 	private static int nameCounter = 0;
+
+	private Question q;
 
 	public AI() {
 		/*FIXME need an argument for number of players
@@ -19,8 +23,6 @@ public class AI extends Player {
 			this.name = "AI# " + ++nameCounter;
 		}
 	}
-
-	private QuantumHand[] hands;
 
 	@Override
 	public void questionResponse(Question q, boolean ans) {
@@ -113,81 +115,25 @@ public class AI extends Player {
 				}
 			}
 		}
-		for (QuantumHand hand : hands) {
-			hand.check();
+		for (int i = 0; i < hands.length; i++) {
+			for (Card c : hands[i].check()) {
+				for (int j = 0; j < hands.length; j++) {
+					hands[j].zero(c);
+				}
+			}
 		}
-//		Set<Card> known = new HashSet<>();
-//		known.addAll(hand.getCards());
-//		List<Integer> units = new ArrayList<>();
-//		for (int i = 0; i < hands.length; i++) {
-//			for (int j = 0; j < 9; j++) {
-//				units.add(hands[i].getBounds()[j][0]);
-//			}
-// 		}
-//		double[][] array = new double[hands.length][48];
-//		for (int i = 0, j = 0; i < 48; i++) {
-//			if (!known.contains(new Card(i))) {
-//				for (int k = 0; k < units.size(); k++) {
-//					array[j][k] = hands[players.get(j)].getProb(new Card(i));
-//				}
-//				j++;
-//			}
-//		}
-		//TODO list
-		/*
-		iterate through quantum hands
-		adjust bounds
-		update hands to remove cards
-		sum decided cards
-		construct a m (p * 6 tall) (48 - decided cards wide)
-		apply hocus pocus twice
-		average
-		rebuild all of the quantum hands
-		*/
-//		for (int i = 0; i < 8; i++) {
-//			for (int j = 0; j < hands.length; j++) {
-//				if (j != id) {
-//					int min = 0;
-//					int max = 0;
-//					for (int k = 0; k < hands.length; k++) {
-//						if (k != j) {//FIXME what about my cards?????
-//							min += hands[k].getBounds()[i][0];
-//							max += hands[k].getBounds()[i][1];
-//						} else {
-//							min += hand.getSuit(i)//FIXME maybe i was drunk?
-//									.size();
-//							max += hand.getSuit(i)
-//									.size();
-//						}
-//					}
-//					hands[j].getBounds()[i][0] = Math
-//							.max(hands[j].getBounds()[i][0],
-//									6 - max);
-//					hands[j].getBounds()[i][1] = Math
-//							.min(hands[j].getBounds()[i][1],
-//									6 - min);
-//				}
-//			}
-//		}
-//		int source = q.source;
-//		int dest = q.dest;
-//		Card c = q.c;
-//		if (ans) {
-//
-//		} else {
-//			QuantumHand sQh = hands[source];
-//			/* FIXME battles and bluffing */
-//			sQh.zero(c);
-//			/* FIXME battles and bluffing */
-//			hands[dest].zero(c);
-//			if (sQh.getHand().getSuit(c.suit).size() == 0) {//FIXME still drunk
-//				sQh.getBounds()[c.suit][0] = Math.max(
-//						sQh.getBounds()[c.suit][0], 1);
-//			}
-//		}
-//		for (QuantumHand hand : hands) {
-//			hand.update();
-//		}
+		q = null;
+		l: for (int i = 0; i < hands.length; i++) {
+			if (i != id) {
+				for (Card c : hands[i].getHand().getCards()) {
+					if (hand.getSuit(c.suit).size() > 0) {
+						q = new Question(id, i, c);
+						break l;
+					}
+				}
+			}
+		}
+		
 	}
 
 	@Override

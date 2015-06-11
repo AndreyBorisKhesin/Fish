@@ -2,7 +2,9 @@ package fish;
 
 import static fish.Util.isZero;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,12 +65,15 @@ public class QuantumHand {
 		}
 	}
 
-	public void check() {
+	public List<Card> check() {
+		List<Card> list = new ArrayList<>();
 		for (int i = 0; i < 48; i++) {
 			if (isZero(quantumHand[suit(new Card(i))].get(new Card(i)) - 1)) {
 				fix(new Card(i));
+				list.add(new Card(i));
 			}
 		}
+		return list;
 	}
 
 	public void fix(Card c) {
