@@ -24,12 +24,14 @@ public abstract class Player {
 
 	public int id;
 
+	public int seat;
+
 	public Map<Integer, Team> tricks;
 
 	public List<OtherPlayerData> others;
-	
+
 	public int turn;
-	
+
 	public Declaration dec;
 
 	protected PlayerInterface pi;
@@ -42,9 +44,19 @@ public abstract class Player {
 		this.pi = pi;
 	}
 
-	public abstract void updateGameState(PlayerState p,
+	public void updateGameState(PlayerState p,
 			List<OtherPlayerData> others,
-			Map<Integer, Team> tricks, int turn, Declaration dec);
+			Map<Integer, Team> tricks, int turn, Declaration dec) {
+		this.hand = p.hand;
+		this.team = p.team;
+		this.id = p.id;
+		this.seat = p.seat;
+		this.tricks = tricks;
+		this.others = others;
+		this.tricks = tricks;
+		this.turn = turn;
+		this.dec = dec;
+	}
 
 	public abstract void questionAsked(Question q);
 

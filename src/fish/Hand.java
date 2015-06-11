@@ -73,7 +73,7 @@ public class Hand {
 	 */
 	public List<Card> getCardsSorted() {
 		List<Card> cards = new ArrayList<Card>();
-		Arrays.stream(hand).map(cards::addAll);
+		Arrays.stream(hand).forEach(cards::addAll);
 		Collections.sort(cards);
 		return cards;
 	}

@@ -81,7 +81,10 @@ public class PregameController implements Controller {
 			usernames.add(p.getUname());
 		}
 
-		s.broadcast(new PMPregameUpdate(usernames, readied));
+		List<Boolean> readiedCopy = new ArrayList<Boolean>();
+		readiedCopy.addAll(readied);
+		
+		s.broadcast(new PMPregameUpdate(usernames, readiedCopy));
 	}
 
 	@Override

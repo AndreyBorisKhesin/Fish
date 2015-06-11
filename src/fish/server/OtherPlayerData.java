@@ -10,12 +10,14 @@ import fish.Team;
  */
 public class OtherPlayerData {
 	public final int id;
+	public final int seat;
 	public final String uname;
 	public final Team t;
 	public int numCards;
 
-	public OtherPlayerData(int id, String uname, Team t, int numCards) {
+	public OtherPlayerData(int id, int seat, String uname, Team t, int numCards) {
 		this.id = id;
+		this.seat = seat;
 		this.uname = uname;
 		this.t = t;
 		this.numCards = numCards;

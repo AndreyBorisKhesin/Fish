@@ -26,14 +26,7 @@ public class Human extends Player {
 	public void updateGameState(PlayerState p,
 			List<OtherPlayerData> others,
 			Map<Integer, Team> tricks, int turn, Declaration dec) {
-		this.hand = p.hand;
-		this.team = p.team;
-		this.id = p.id;
-		this.tricks = tricks;
-		this.others = others;
-		this.tricks = tricks;
-		this.turn = turn;
-		this.dec = dec;
+		super.updateGameState(p, others, tricks, turn, dec);
 
 		gui.updated();
 	}

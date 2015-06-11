@@ -18,6 +18,11 @@ public class PlayerState {
 	public final int id;
 
 	/**
+	 * The seat around the table
+	 */
+	public final int seat;
+
+	/**
 	 * The name of the player.
 	 */
 	public final String name;
@@ -39,8 +44,9 @@ public class PlayerState {
 	 * @param name The name of the Player.
 	 * @param team The Team of the Player.
 	 */
-	PlayerState(int id, String name, Team team) {
+	PlayerState(int id, int seat, String name, Team team) {
 		this.id = id;
+		this.seat = seat;
 		this.name = name;
 		this.team = team;
 		hand = new Hand();

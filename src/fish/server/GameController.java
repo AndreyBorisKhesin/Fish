@@ -69,17 +69,19 @@ public class GameController implements Controller {
 	}
 
 	private void initGame(List<PlayerInterface> inters) {
-		List<Team> teams = new ArrayList<Team>();
+		List<Integer> seats = new ArrayList<>();
 		for (int i = 0; i < inters.size(); i++) {
-			teams.add(i < inters.size() / 2 ? Team.BLU : Team.RED);
+			seats.add(i);
 		}
-		Collections.shuffle(teams, ServerUtil.rand);
+
+		Collections.shuffle(seats, ServerUtil.rand);
 
 		for (int i = 0; i < inters.size(); i++) {
-			gs.players.add(new PlayerContainer(
-					new PlayerState(i, inters.get(i)
-							.getUname(), teams
-							.get(i)), inters.get(i)));
+			gs.players.add(new PlayerContainer(new PlayerState(i,
+					seats.get(i), inters.get(i).getUname(),
+					seats.get(i) % 2 == 0 ? Team.RED
+							: Team.BLU), inters
+					.get(i)));
 		}
 
 		dealDeck();
@@ -105,8 +107,8 @@ public class GameController implements Controller {
 		List<OtherPlayerData> others = new ArrayList<OtherPlayerData>();
 		for (int i = 0; i < gs.players.size(); i++) {
 			PlayerState ps = gs.players.get(i).s;
-			others.add(new OtherPlayerData(i, ps.name, ps.team,
-					ps.hand.getNumCards()));
+			others.add(new OtherPlayerData(i, ps.seat, ps.name,
+					ps.team, ps.hand.getNumCards()));
 		}
 
 		for (int i = 0; i < gs.players.size(); i++) {
