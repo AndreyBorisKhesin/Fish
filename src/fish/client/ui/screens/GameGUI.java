@@ -227,31 +227,6 @@ public class GameGUI implements GUIScreen {
 			}
 		}
 
-		/* draw the turn arrow */
-		if (mode == DrawMode.WAIT_FOR_Q) {
-			Polygon a = new Polygon(new int[] { -1, 1, 1, 2, 0, -2,
-					-1 },
-					new int[] { -1, -1, 1, 1, 3, 1, 1 }, 7);
-			g.setColor(new Color(0, 0, 0, 128));
-
-			AffineTransform xform = new AffineTransform();
-			xform.translate(gameWidth / 2, h / 2);
-
-			Layout l = turnLayout;
-			if (l != null) {
-				xform.rotate((l.x - 0.5) * gameWidth,
-						-(0.5 - l.y) * h, 0, 0);
-			} else {
-				xform.rotate(0, 0.5, 0, 0);
-			}
-			xform.quadrantRotate(-1);
-			xform.scale(20, 20);
-
-			g.setTransform(xform);
-			g.fill(a);
-			g.setTransform(new AffineTransform());
-		}
-
 		g.clearRect(gameWidth, 0, w - gameWidth, h);
 	}
 
