@@ -85,10 +85,12 @@ public class ClientMaster {
 
 		/* connect the ais */
 		for (int i = 1; i < numPlayers; i++) {
-			Player ai = new AI();
-			server.insertMessage(new SMConnection(
-					new LocalInterface(server, ai)));
-			server.insertMessage(new SMReady(i, true));
+			server.addAI();
+		}
+		
+		try {
+			Thread.sleep(100);
+		} catch(InterruptedException e) {
 		}
 
 		server.insertMessage(new MStartGame(0));

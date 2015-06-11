@@ -15,13 +15,11 @@ public class AI extends Player {
 
 	private Question q;
 
-	public AI() {
+	public AI(String s) {
 		/*FIXME need an argument for number of players
 		hands = new QuantumHand[THAT NUMBER];
 		hands[id] = new QuantumHand(hand);*/
-		synchronized (AI.class) {
-			this.name = "AI# " + ++nameCounter;
-		}
+		this.name = s;
 	}
 
 	@Override
@@ -167,10 +165,8 @@ public class AI extends Player {
 
 	}
 
-	/**
-	 * Allow the clientmaster to ready us up
-	 */
 	@Override
 	public void connected() {
+		pi.ready(true);
 	}
 }

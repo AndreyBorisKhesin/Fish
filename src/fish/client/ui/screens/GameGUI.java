@@ -159,7 +159,7 @@ public class GameGUI implements GUIScreen {
 			}
 			/* draw the name of the player */
 			{
-				g.setFont(Resources.GAME_FONT);
+				g.setFont(Resources.GAME_FONT.deriveFont(10f));
 				g.setColor(Color.BLACK);
 				FontMetrics fm = g.getFontMetrics();
 

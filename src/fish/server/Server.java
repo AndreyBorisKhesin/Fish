@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import fish.players.AI;
+import fish.players.Player;
 import fish.server.messages.PlayerMessage;
+import fish.server.messages.SMConnection;
+import fish.server.messages.SMReady;
 import fish.server.messages.ServerMessage;
+import fish.server.playerinterface.LocalInterface;
 import fish.server.playerinterface.PlayerInterface;
 
 /**
@@ -45,9 +50,13 @@ public class Server implements Runnable {
 	 */
 	private Controller pregameC, gameC;
 
+	private AINames ainames;
+
 	public Server() {
 		sq = new ConcurrentLinkedQueue<ServerMessage>();
 		clients = new ArrayList<PlayerInterface>();
+
+		ainames = new AINames();
 
 		(t = new Thread(this)).start();
 	}
@@ -108,6 +117,12 @@ public class Server implements Runnable {
 		PRE_GAME, GAME;
 	}
 
+	public void addAI() {
+		Player ai = new AI(ainames.getName());
+		this.insertMessage(new SMConnection(
+				new LocalInterface(this, ai)));
+	}
+	
 	/**
 	 * Send a message to all connected players
 	 * 
