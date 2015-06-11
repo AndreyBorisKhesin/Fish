@@ -50,6 +50,36 @@ public class QuantumHand {
 		}
 	}
 
+	public QuantumHand(Hand hand) {
+		this.hand = hand;
+		for (int i = 0; i < 8; i++) {
+			quantumHand[i] = new HashMap<>();
+			bounds[i][0] = 0;
+			bounds[i][1] = 0;
+		}
+		quantumHand[8] = new HashMap<>();
+		for (int i = 0; i < 48; i++) {
+			quantumHand[8].put(new Card(i), 0d);
+		}
+	}
+
+	public void check() {
+		for (int i = 0; i < 48; i++) {
+			if (isZero(quantumHand[suit(new Card(i))].get(new Card(i)) - 1)) {
+				fix(new Card(i));
+			}
+		}
+	}
+
+	public void fix(Card c) {
+		if (!isZero(quantumHand[suit(c)].get(c))) {
+			bounds[suit(c)][0]--;
+			bounds[suit(c)][1]--;
+		}
+		hand.add(c);
+		zero(c);
+	}
+
 	public int suit(int suit) {
 		return moved[suit] ? suit : 8;
 	}
@@ -61,51 +91,23 @@ public class QuantumHand {
 	/**
 	 * Updates and re-balances the QuantumHand.
 	 */
-	public void update() {
-		boolean b = true;
-		while (b) {
-			b = false;
-			for (int i = 0; i < 8; i++) {
-				if (!moved[i]) {
-					int pos = 0;
-					for (Card c : quantumHand[8].keySet()) {
-						if (c.suit == i) {
-							pos++;
-						}
-					}
-					bounds[i][1] = Math.min(bounds[i][1], pos);
-					if (bounds[i][0] == bounds[i][1]) {
-						for (int j = 0; j < 6; j++) {
-							Card c = new Card(i * 6 + j);
-							if (quantumHand[8].containsKey(c)) {
-								quantumHand[i].put(c, quantumHand[8].remove(c));
-							}
-						}
-						moved[i] = true;
-						b = true;
-					}
-				}
-				for (int j = 0; j < 6; j++) {
-					Card c = new Card(6 * i + j);
-					if (quantumHand[i].containsKey(c)
-							&& isZero(quantumHand[i].get(c) - 1)) {
-						quantumHand[i].remove(c);
-						hand.add(c);
-						bounds[i][0]--;
-						bounds[i][1]--;
-						b = true;
-					}
+	public void move(int suit) {
+		if (!moved[suit]) {
+			int pos = 0;
+			for (Card c : quantumHand[8].keySet()) {
+				if (c.suit == suit) {
+					pos++;
 				}
 			}
-			for (int i = 0; i < 48; i++) {
-				Card c = new Card(i);
-				if (quantumHand[8].containsKey(c)
-						&& isZero(quantumHand[8].get(c) - 1)) {
-					quantumHand[8].remove(c);
-					hand.add(c);
-					bounds[8][0]--;
-					bounds[8][1]--;
+			bounds[suit][1] = Math.min(bounds[suit][1], pos);
+			if (bounds[suit][0] == bounds[suit][1]) {
+				for (int j = 0; j < 6; j++) {
+					Card c = new Card(suit * 6 + j);
+					if (quantumHand[8].containsKey(c)) {
+						quantumHand[suit].put(c, quantumHand[8].remove(c));
+					}
 				}
+				moved[suit] = true;
 			}
 		}
 	}
@@ -134,5 +136,17 @@ public class QuantumHand {
 
 	public int[][] getBounds() {
 		return bounds;
+	}
+
+	public boolean[] getMoved() {
+		return moved;
+	}
+
+	public double getProb(Card c) {
+		if (hand.contains(c)) {
+			return 1;
+		} else {
+			return quantumHand[suit(c)].get(c);
+		}
 	}
 }

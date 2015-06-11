@@ -21,7 +21,7 @@ public final class Util {
 	/**
 	 * Generic floating point epsilon value
 	 */
-	public static final Double EPS = 1e-6;
+	public static final Double EPS = 1e-9;
 
 	public static boolean isZero(double a) {
 		return Math.abs(a) < EPS;
