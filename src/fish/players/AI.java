@@ -68,8 +68,8 @@ public class AI extends Player {
 			for (int j = 0; j < 9; j++) {
 				for (int k = 0; k < 48; k++) {
 					if (hands[i].getQuantumHand()[j].containsKey(new Card(k))
-							&& !isZero(hands[i].getProb(new Card(k)))) {
-						array[9 * i + j][k] = hands[i].getProb(new Card(k));
+							&& !isZero(hands[i].get(new Card(k)))) {
+						array[9 * i + j][k] = hands[i].get(new Card(k));
 					}
 				}
 				if (j == 8 || hands[i].getMoved()[j]) {
@@ -122,16 +122,28 @@ public class AI extends Player {
 		}
 		q = null;
 		l: for (int i = 0; i < hands.length; i++) {
-			if (i != id) {
-				for (Card c : hands[i].getHand().getCards()) {
-					if (hand.getSuit(c.suit).size() > 0) {
-						q = new Question(id, i, c);
-						break l;
-					}
+			if (i == id) {
+				continue;
+			}
+			for (Card c : hands[i].getHand().getCards()) {
+				if (hand.getSuit(c.suit).size() > 0) {
+					q = new Question(id, i, c);
+					break l;
 				}
 			}
 		}
-		
+		//FIXME battles and bluffing
+		if (q == null) {
+			double max = 0;
+			for (int i = 0; i < hands.length; i++) {
+				if (i == id) {
+					continue;
+				}
+				for (int j = 0; j < 48; j++) {
+
+				}
+			}
+		}
 	}
 
 	@Override
