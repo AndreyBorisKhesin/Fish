@@ -68,8 +68,8 @@ public class QuantumHand {
 	public List<Card> check() {
 		List<Card> list = new ArrayList<>();
 		for (int i = 0; i < 48; i++) {
-			if (isZero(this.get(new Card(i)) - 1)) {
-				fix(new Card(i));
+			if (isZero(this.get(i) - 1)) {
+				fix(i);
 				list.add(new Card(i));
 			}
 		}
@@ -85,6 +85,10 @@ public class QuantumHand {
 		zero(c);
 	}
 
+	public void fix(int i) {
+		fix(new Card(i));
+	}
+
 	public double get(Card c) {
 		if (hand.contains(c)) {
 			return 1;
@@ -93,6 +97,10 @@ public class QuantumHand {
 			return 0;
 		}
 		return quantumHand[suit(c)].get(c);
+	}
+
+	public double get(int i) {
+		return get(new Card(i));
 	}
 
 	public int suit(int suit) {
@@ -129,6 +137,10 @@ public class QuantumHand {
 
 	public void zero(Card c) {
 		quantumHand[suit(c)].remove(c);
+	}
+
+	public void zero(int i) {
+		zero(new Card(i));
 	}
 
 	/**
