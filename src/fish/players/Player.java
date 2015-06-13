@@ -34,7 +34,7 @@ public abstract class Player {
 
 	public Declaration dec;
 
-	protected PlayerInterface pi;
+	public PlayerInterface pi;
 
 	public String getName() {
 		return name;

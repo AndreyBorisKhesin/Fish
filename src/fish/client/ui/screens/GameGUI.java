@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import fish.Card;
+import fish.Question;
 import fish.Team;
 import fish.client.ui.FishGUI;
 import fish.client.ui.Resources;
@@ -46,10 +47,9 @@ public class GameGUI implements GUIScreen {
 
 	/* state variables for WAIT_FOR_Q */
 	private int selection;
-	private int askee;
 
 	/* state variables for ASK_QUESTION */
-	double suitscale = 1.5;
+	private double cardscale = 1.5;
 
 	private static enum AskMode {
 		SUIT, RANK
@@ -61,6 +61,8 @@ public class GameGUI implements GUIScreen {
 
 	private int suitselection;
 	private int rankselection;
+
+	private int askee;
 
 	public GameGUI(FishGUI gui) {
 		this.gui = gui;
@@ -81,6 +83,18 @@ public class GameGUI implements GUIScreen {
 		this.p = p;
 	}
 
+	private void switchMode(DrawMode mode) {
+		this.mode = mode;
+		mouseMoved();
+		this.updated();
+	}
+
+	private void switchAskMode(AskMode mode) {
+		this.askmode = mode;
+		mouseMoved();
+		this.updated();
+	}
+
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
 		this.w = w;
@@ -92,12 +106,15 @@ public class GameGUI implements GUIScreen {
 			return;
 		}
 
-		p.turn = p.id;
-
 		drawBasicGame(g);
 
-		if (mode == DrawMode.ASK_QUESTION) {
+		switch (mode) {
+		case WAIT_FOR_Q:
+			drawWaitForQuestion(g);
+			break;
+		case ASK_QUESTION:
 			drawAskQuestion(g);
+			break;
 		}
 
 		g.clearRect(gw, 0, w - gw, h);
@@ -248,6 +265,18 @@ public class GameGUI implements GUIScreen {
 		}
 	}
 
+	private void drawWaitForQuestion(Graphics2D g) {
+		if (p.turn != p.id)
+			return;
+		String s = "Select a player to ask";
+
+		g.setColor(Color.BLACK);
+		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		FontMetrics fm = g.getFontMetrics();
+		g.drawString(s, (int) (0.5 * gw - fm.stringWidth(s) / 2),
+				(int) (0.5 * h + fm.getAscent() / 2));
+	}
+
 	private void drawAskQuestion(Graphics2D g) {
 		switch (askmode) {
 		case SUIT:
@@ -260,7 +289,7 @@ public class GameGUI implements GUIScreen {
 	}
 
 	private void drawAskSuit(Graphics2D g) {
-		double scale = suitscale;
+		double scale = cardscale;
 
 		String s = "Select a half suit to ask for";
 
@@ -275,8 +304,8 @@ public class GameGUI implements GUIScreen {
 			AffineTransform xform = new AffineTransform();
 			xform.translate(0.5 * gw, 0.5 * h - 10);
 			xform.scale(scale, scale);
-			xform.translate(((i / 2) - 2) * 81, ((i % 2) - 1) * 96
-					+ ((i % 2) * 2 - 1) * 5);
+			xform.translate(((i / 2) - 2) * 81,
+					((i % 2) - 1) * 106 + 5);
 
 			g.setTransform(xform);
 			/* if its selected outline it */
@@ -293,7 +322,37 @@ public class GameGUI implements GUIScreen {
 	}
 
 	private void drawAskRank(Graphics2D g) {
+		double scale = cardscale;
 
+		String s = "Select a rank to ask for";
+
+		g.setColor(Color.BLACK);
+		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		FontMetrics fm = g.getFontMetrics();
+		g.drawString(s,
+				(int) (0.5 * gw - fm.stringWidth(s) / 2),
+				(int) (0.5 * h - 111 * scale - fm.getDescent() - 10));
+
+		for (int i = 0; i < 6; i++) {
+			AffineTransform xform = new AffineTransform();
+			xform.translate(0.5 * gw, 0.5 * h - 10);
+			xform.scale(scale, scale);
+			xform.translate(((i / 2) - 2) * 81,
+					((i % 2) - 1) * 106 + 5);
+			xform.translate(71 / 2., 0);
+
+			g.setTransform(xform);
+			/* if its selected outline it */
+			if (rankselection == i) {
+				g.setColor(Resources.GLOW);
+				g.fillRoundRect(-10, -10, 91, 116, 10, 10);
+			}
+
+			BufferedImage img = Resources.CARD_IMGS.get(new Card(
+					suitselection, i));
+			g.drawImage(img, 0, 0, null);
+			g.setTransform(new AffineTransform());
+		}
 	}
 
 	/**
@@ -355,6 +414,10 @@ public class GameGUI implements GUIScreen {
 		mx = e.getX();
 		my = e.getY();
 
+		mouseMoved();
+	}
+
+	private void mouseMoved() {
 		switch (mode) {
 		case WAIT_FOR_Q:
 			movedWaitForQuestion();
@@ -411,6 +474,10 @@ public class GameGUI implements GUIScreen {
 		switch (askmode) {
 		case SUIT:
 			movedAskSuit();
+			break;
+		case RANK:
+			movedAskRank();
+			break;
 		}
 	}
 
@@ -429,7 +496,7 @@ public class GameGUI implements GUIScreen {
 			 */
 			AffineTransform xform = new AffineTransform();
 			xform.translate(0.5 * gw, 0.5 * h - 10);
-			xform.scale(suitscale, suitscale);
+			xform.scale(cardscale, cardscale);
 			xform.translate(((i / 2) - 2) * 81, ((i % 2) - 1) * 96
 					+ ((i % 2) * 2 - 1) * 5);
 
@@ -451,6 +518,45 @@ public class GameGUI implements GUIScreen {
 		if (oldselection != suitselection) {
 			this.updated();
 			System.out.println("Selected suit: " + suitselection);
+		}
+	}
+
+	private void movedAskRank() {
+		int oldselection = rankselection;
+
+		rankselection = -1;
+
+		for (int i = 0; i < 6; i++) {
+			/*
+			 * we use the same code as for drawing the cards in the
+			 * ask suit function to determine if we are in the right
+			 * range
+			 */
+			AffineTransform xform = new AffineTransform();
+			xform.translate(0.5 * gw, 0.5 * h - 10);
+			xform.scale(cardscale, cardscale);
+			xform.translate(((i / 2) - 2) * 81, ((i % 2) - 1) * 96
+					+ ((i % 2) * 2 - 1) * 5);
+			xform.translate(71 / 2., 0);
+
+			Point2D res = null;
+			try {
+				res = xform.inverseTransform(new Point(mx, my),
+						null);
+			} catch (NoninvertibleTransformException e) {
+				/* this should never happen */
+				e.printStackTrace();
+			}
+
+			if (res.getX() >= 0 && res.getX() < 71
+					&& res.getY() >= 0 && res.getY() < 96) {
+				rankselection = i;
+			}
+		}
+
+		if (oldselection != rankselection) {
+			this.updated();
+			System.out.println("Selected rank: " + rankselection);
 		}
 	}
 
@@ -480,10 +586,6 @@ public class GameGUI implements GUIScreen {
 
 			askee = selection;
 
-			mode = DrawMode.ASK_QUESTION;
-
-			askmode = AskMode.SUIT;
-
 			rankselection = -1;
 			suitselection = -1;
 
@@ -492,7 +594,8 @@ public class GameGUI implements GUIScreen {
 				this.grayedsuits[i] = p.hand.getSuit(i).size() == 0;
 			}
 
-			this.updated();
+			askmode = AskMode.SUIT;
+			switchMode(DrawMode.ASK_QUESTION);
 		}
 	}
 
@@ -500,14 +603,32 @@ public class GameGUI implements GUIScreen {
 		switch (askmode) {
 		case SUIT:
 			if (suitselection == -1) {
-				mode = DrawMode.WAIT_FOR_Q;
-				movedWaitForQuestion();
+				switchMode(DrawMode.WAIT_FOR_Q);
 			} else {
-				askmode = AskMode.RANK;
-				rankselection = -1;
+				switchAskMode(AskMode.RANK);
 			}
 
-			this.updated();
+			break;
+		case RANK:
+			if (rankselection == -1) {
+				switchMode(DrawMode.WAIT_FOR_Q);
+			} else {
+				/*
+				 * We construct and send the question. In the
+				 * meantime we return to waiting for questions,
+				 * but make it appear as if it is no longer our
+				 * turn so we can't screw anything up while we
+				 * wait for a response.
+				 */
+				p.pi.sendQuestion(new Question(p.id, selection,
+						new Card(suitselection,
+								rankselection)));
+
+				this.selection = -1;
+				p.turn = -1;
+				switchMode(DrawMode.WAIT_FOR_Q);
+			}
+
 			break;
 		}
 	}
