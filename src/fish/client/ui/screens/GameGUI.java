@@ -2,18 +2,24 @@ package fish.client.ui.screens;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import fish.Card;
+import fish.Team;
 import fish.client.ui.FishGUI;
 import fish.client.ui.Resources;
 import fish.players.Human;
@@ -28,13 +34,40 @@ public class GameGUI implements GUIScreen {
 	private DrawMode mode;
 
 	private static enum DrawMode {
-		WAIT_FOR_Q, DECLARATION, QUESTION
+		WAIT_FOR_Q, DECLARATION, ASK_QUESTION, QUESTION_RESPONSE,
 	}
+
+	private int w, h;
+	/* the width of the game screen */
+	private int gw;
+
+	/* location of the mouse */
+	private int mx = Integer.MAX_VALUE, my = Integer.MAX_VALUE;
+
+	/* state variables for WAIT_FOR_Q */
+	private int selection;
+	private int askee;
+
+	/* state variables for ASK_QUESTION */
+	double suitscale = 1.5;
+
+	private static enum AskMode {
+		SUIT, RANK
+	}
+
+	private AskMode askmode;
+
+	private boolean[] grayedsuits;
+
+	private int suitselection;
+	private int rankselection;
 
 	public GameGUI(FishGUI gui) {
 		this.gui = gui;
 
 		mode = DrawMode.WAIT_FOR_Q;
+
+		selection = -1;
 	}
 
 	/**
@@ -50,13 +83,30 @@ public class GameGUI implements GUIScreen {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
-		int gameWidth = w - 250;
+		this.w = w;
+		this.h = h;
+		this.gw = w - 250;
 
 		/* if the player is null or the hand is null we aren't ready yet */
 		if (p == null || p.hand == null) {
 			return;
 		}
 
+		p.turn = p.id;
+
+		drawBasicGame(g);
+
+		if (mode == DrawMode.ASK_QUESTION) {
+			drawAskQuestion(g);
+		}
+
+		g.clearRect(gw, 0, w - gw, h);
+	}
+
+	/**
+	 * Draws the basic parts of the game such as your and others' hands
+	 */
+	private void drawBasicGame(Graphics2D g) {
 		/* draw your hand */
 		{
 			/* amount the card drawing is scaled by */
@@ -64,7 +114,7 @@ public class GameGUI implements GUIScreen {
 			int handwidth = (int) (((p.hand.getNumCards() - 1) * 12 + 71) * cardScale);
 			AffineTransform transform = new AffineTransform();
 
-			transform.translate(gameWidth / 2 - handwidth / 2, h);
+			transform.translate(gw / 2 - handwidth / 2, h);
 			transform.scale(cardScale, cardScale);
 			/* the size of the cards in pixels */
 			transform.translate(0, -96 / 2);
@@ -74,15 +124,15 @@ public class GameGUI implements GUIScreen {
 			/* if it is your turn draw an outline around your hand */
 			if (p.turn == p.id) {
 				g.setColor(Resources.GLOW);
-				g.fillRoundRect(gameWidth / 2 - handwidth / 2
-						- 40, h - handheight - 40,
-						handwidth + 40 * 2,
+				g.fillRoundRect(gw / 2 - handwidth / 2 - 40, h
+						- handheight - 65,
+						handwidth + 80,
 						handheight + 40 * 2, 20, 20);
 			}
 
 			/* draw an outline around the cards */
 			g.setColor(p.team.getColor());
-			g.fillRoundRect(gameWidth / 2 - handwidth / 2 - 20, h
+			g.fillRoundRect(gw / 2 - handwidth / 2 - 20, h
 					- handheight - 20, handwidth + 20 * 2,
 					handheight + 20 * 2, 20, 20);
 
@@ -96,7 +146,7 @@ public class GameGUI implements GUIScreen {
 			g.setFont(Resources.GAME_FONT.deriveFont(40f));
 			FontMetrics fm = g.getFontMetrics();
 			g.setColor(Color.BLACK);
-			g.drawString(p.name, gameWidth / 2 - handwidth / 2, h
+			g.drawString(p.name, gw / 2 - handwidth / 2, h
 					- handheight - 20 - fm.getDescent() + 1);
 		}
 
@@ -106,7 +156,6 @@ public class GameGUI implements GUIScreen {
 		Collections.sort(table,
 				((a, b) -> Integer.compare(a.seat, b.seat)));
 
-		Layout turnLayout = null;
 		/* draw opponents, cycling around from our seat */
 		/* lidx represents position in the layout list */
 		for (int i = (p.seat + 1) % table.size(), lidx = 0; i != p.seat; i = (i + 1)
@@ -116,12 +165,7 @@ public class GameGUI implements GUIScreen {
 
 			double scale = getLayoutScale(table.size());
 
-			/* assign the turn seat */
-			if (d.id == p.turn) {
-				turnLayout = l;
-			}
-
-			int x = (int) (l.x * gameWidth);
+			int x = (int) (l.x * gw);
 			int y = (int) (l.y * h);
 
 			/* draw the card */
@@ -130,67 +174,33 @@ public class GameGUI implements GUIScreen {
 				/* translate to drawing location */
 				xform.translate(x, y);
 				/* rotate */
-				xform.quadrantRotate(-l.rot);
+				xform.quadrantRotate(l.rot);
 				/* scale card */
 				xform.scale(scale, scale);
 				/* translate to centre of card */
 				xform.translate(-71 / 2, -96 / 2);
 
+				/* if they are selected, indicate that */
+				if (mode == DrawMode.WAIT_FOR_Q
+						&& p.turn == p.id
+						&& selection == d.id
+						&& d.t != p.team) {
+					xform.translate(0, -10);
+				}
+
 				g.setTransform(xform);
+				/* if it's their turn draw the glow */
 				if (d.id == p.turn) {
 					g.setColor(Resources.GLOW);
-					g.fillRoundRect(-10,
-							-10,
-							71 + 10 * 2,
+					g.fillRoundRect(-10, -10, 71 + 10 * 2,
 							96 + 10 * 2, 10, 10);
 				}
-				g.drawImage(Resources.CARD_BACKS.get(d.t), 0,
-						0, null);
+				/* render the card back image */
+				BufferedImage cardImg = drawCardBack(d.t,
+						d.numCards, l.rot);
+				g.drawImage(cardImg, AffineTransform
+						.getScaleInstance(.1, .1), null);
 				g.setTransform(new AffineTransform());
-			}
-			/* draw the number on the card */
-			{
-				TextLayout num = new TextLayout(
-						"" + d.numCards,
-						Resources.GAME_FONT
-								.deriveFont(40f),
-						g.getFontRenderContext());
-
-				Shape s = num.getOutline(AffineTransform
-						.getScaleInstance(scale, scale));
-
-				Stroke orig = g.getStroke();
-				g.setStroke(new BasicStroke(2));
-
-				AffineTransform xform = AffineTransform
-						.getTranslateInstance(x, y);
-				switch (l.rot) {
-				case 1:
-					xform.translate((int) (20 * scale), -5);
-					break;
-				case 2:
-					xform.translate(0, (int) (20 * scale));
-					break;
-				case 3:
-					xform.translate((int) (-20 * scale), -5);
-					break;
-				}
-				/* translate by the font size */
-				FontMetrics fm = g
-						.getFontMetrics(Resources.GAME_FONT
-								.deriveFont(40f));
-				xform.translate(scale
-						* (-fm.stringWidth(""
-								+ d.numCards) / 2),
-						scale * (fm.getAscent() / 2));
-				g.setTransform(xform);
-				g.setColor(Color.WHITE);
-				g.fill(s);
-				g.setColor(Color.BLACK);
-				g.draw(s);
-				g.setTransform(new AffineTransform());
-
-				g.setStroke(orig);
 			}
 			/* draw the name of the player */
 			{
@@ -212,10 +222,20 @@ public class GameGUI implements GUIScreen {
 				case 2:
 					tx = -36;
 					ty = 48 + fm.getAscent();
+					/*
+					 * if they are selected, we have to
+					 * shift the name too
+					 */
+					if (mode == DrawMode.WAIT_FOR_Q
+							&& p.turn == p.id
+							&& selection == d.id
+							&& d.t != p.team) {
+						ty += 10;
+					}
 					break;
 				case 3:
 					tx = -48;
-					ty = -36;
+					ty = -37;
 					break;
 				}
 
@@ -226,12 +246,270 @@ public class GameGUI implements GUIScreen {
 				g.setTransform(new AffineTransform());
 			}
 		}
+	}
 
-		g.clearRect(gameWidth, 0, w - gameWidth, h);
+	private void drawAskQuestion(Graphics2D g) {
+		switch (askmode) {
+		case SUIT:
+			drawAskSuit(g);
+			break;
+		case RANK:
+			drawAskRank(g);
+			break;
+		}
+	}
+
+	private void drawAskSuit(Graphics2D g) {
+		double scale = suitscale;
+
+		String s = "Select a half suit to ask for";
+
+		g.setColor(Color.BLACK);
+		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		FontMetrics fm = g.getFontMetrics();
+		g.drawString(s,
+				(int) (0.5 * gw - fm.stringWidth(s) / 2),
+				(int) (0.5 * h - 111 * scale - fm.getDescent() - 10));
+
+		for (int i = 0; i < 8; i++) {
+			AffineTransform xform = new AffineTransform();
+			xform.translate(0.5 * gw, 0.5 * h - 10);
+			xform.scale(scale, scale);
+			xform.translate(((i / 2) - 2) * 81, ((i % 2) - 1) * 96
+					+ ((i % 2) * 2 - 1) * 5);
+
+			g.setTransform(xform);
+			/* if its selected outline it */
+			if (suitselection == i) {
+				g.setColor(Resources.GLOW);
+				g.fillRoundRect(-10, -10, 91, 116, 10, 10);
+			}
+
+			BufferedImage img = (!grayedsuits[i] ? Resources.SUIT_CARDS
+					: Resources.SUIT_CARDS_GRAY).get(i);
+			g.drawImage(img, 0, 0, null);
+			g.setTransform(new AffineTransform());
+		}
+	}
+
+	private void drawAskRank(Graphics2D g) {
+
+	}
+
+	/**
+	 * Buffer used for the function below, we scale it up by 10 so we can
+	 * later downsize it to the right size without the text looking blocky
+	 */
+	private BufferedImage cardBackBuf = new BufferedImage(71 * 10, 96 * 10,
+			BufferedImage.TYPE_INT_ARGB);
+	private Graphics2D cardBackG = (Graphics2D) cardBackBuf.getGraphics();
+
+	/**
+	 * The image return here is reused so it must be drawn before the next
+	 * call to this function
+	 */
+	private BufferedImage drawCardBack(Team t, int numCards, int rot) {
+		Graphics2D g = cardBackG;
+
+		g.drawImage(Resources.CARD_BACKS.get(t),
+				AffineTransform.getScaleInstance(10, 10), null);
+
+		Font f = Resources.GAME_FONT.deriveFont(40f);
+		/* translate by the font size */
+		FontMetrics fm = g.getFontMetrics(f);
+
+		AffineTransform xform = new AffineTransform();
+
+		xform.scale(10, 10);
+		xform.translate(71 / 2., 27.5);
+		xform.quadrantRotate(-rot);
+		xform.translate(-fm.stringWidth("" + numCards) / 2,
+				fm.getAscent() / 2 - 2);
+
+		TextLayout num = new TextLayout("" + numCards, f,
+				g.getFontRenderContext());
+
+		Shape s = num.getOutline(null);
+
+		Stroke orig = g.getStroke();
+		g.setStroke(new BasicStroke(2));
+
+		g.setTransform(xform);
+		g.setColor(Color.WHITE);
+		g.fill(s);
+		g.setColor(Color.BLACK);
+		g.draw(s);
+		g.setTransform(new AffineTransform());
+
+		g.setStroke(orig);
+
+		return cardBackBuf;
 	}
 
 	public void updated() {
 		gui.repaint();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		mx = e.getX();
+		my = e.getY();
+
+		switch (mode) {
+		case WAIT_FOR_Q:
+			movedWaitForQuestion();
+			break;
+		case ASK_QUESTION:
+			movedAskQuestion();
+			break;
+		}
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		mouseMoved(e);
+	}
+
+	private void movedWaitForQuestion() {
+		if (p.others == null) {
+			return;
+		}
+		int oldSelection = selection;
+
+		selection = -1;
+
+		double scale = getLayoutScale(p.others.size());
+		for (int i = 0; i < getLayoutSet(p.others.size()).length; i++) {
+			Layout l = getLayoutSet(p.others.size())[i];
+			Point2D src = new Point2D.Double(mx - l.x * gw, my
+					- l.y * h);
+			AffineTransform xform = AffineTransform
+					.getQuadrantRotateInstance(-l.rot);
+
+			Point2D res = xform.transform(src, null);
+
+			if (Math.abs(res.getX()) <= scale * 71 / 2.
+					&& res.getY() <= 0
+					&& res.getY() >= -48 * scale) {
+				int seat = (p.seat + i + 1) % p.others.size();
+
+				for (OtherPlayerData d : p.others) {
+					if (d.seat == seat) {
+						selection = d.id;
+					}
+				}
+			}
+		}
+
+		if (selection != oldSelection) {
+			System.out.println("Selected " + selection);
+			this.updated();
+		}
+	}
+
+	private void movedAskQuestion() {
+		switch (askmode) {
+		case SUIT:
+			movedAskSuit();
+		}
+	}
+
+	private void movedAskSuit() {
+		int oldselection = suitselection;
+
+		suitselection = -1;
+
+		for (int i = 0; i < 8; i++) {
+			if (grayedsuits[i])
+				continue;
+			/*
+			 * we use the same code as for drawing the cards in the
+			 * ask suit function to determine if we are in the right
+			 * range
+			 */
+			AffineTransform xform = new AffineTransform();
+			xform.translate(0.5 * gw, 0.5 * h - 10);
+			xform.scale(suitscale, suitscale);
+			xform.translate(((i / 2) - 2) * 81, ((i % 2) - 1) * 96
+					+ ((i % 2) * 2 - 1) * 5);
+
+			Point2D res = null;
+			try {
+				res = xform.inverseTransform(new Point(mx, my),
+						null);
+			} catch (NoninvertibleTransformException e) {
+				/* this should never happen */
+				e.printStackTrace();
+			}
+
+			if (res.getX() >= 0 && res.getX() < 71
+					&& res.getY() >= 0 && res.getY() < 96) {
+				suitselection = i;
+			}
+		}
+
+		if (oldselection != suitselection) {
+			this.updated();
+			System.out.println("Selected suit: " + suitselection);
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (e.getButton() != MouseEvent.BUTTON1) {
+			return;
+		}
+
+		switch (mode) {
+		case WAIT_FOR_Q:
+			clickWaitForQuestion();
+			break;
+		case ASK_QUESTION:
+			clickAskQuestion();
+			break;
+		}
+	}
+
+	private void clickWaitForQuestion() {
+		if (p.turn == p.id && selection != -1) {
+			for (OtherPlayerData d : p.others) {
+				if (d.id == selection && d.t == p.team) {
+					break;
+				}
+			}
+
+			askee = selection;
+
+			mode = DrawMode.ASK_QUESTION;
+
+			askmode = AskMode.SUIT;
+
+			rankselection = -1;
+			suitselection = -1;
+
+			this.grayedsuits = new boolean[8];
+			for (int i = 0; i < 8; i++) {
+				this.grayedsuits[i] = p.hand.getSuit(i).size() == 0;
+			}
+
+			this.updated();
+		}
+	}
+
+	private void clickAskQuestion() {
+		switch (askmode) {
+		case SUIT:
+			if (suitselection == -1) {
+				mode = DrawMode.WAIT_FOR_Q;
+				movedWaitForQuestion();
+			} else {
+				askmode = AskMode.RANK;
+				rankselection = -1;
+			}
+
+			this.updated();
+			break;
+		}
 	}
 
 	/**
