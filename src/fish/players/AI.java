@@ -67,10 +67,7 @@ public class AI extends Player {
 		for (int i = 0; i < hands.length; i++) {
 			for (int j = 0; j < 9; j++) {
 				for (int k = 0; k < 48; k++) {
-					if (hands[i].getQuantumHand()[j].containsKey(new Card(k))
-							&& !isZero(hands[i].get(new Card(k)))) {
-						array[9 * i + j][k] = hands[i].get(new Card(k));
-					}
+					array[9 * i + j][k] = hands[i].get(k);
 				}
 				if (j == 8 || hands[i].getMoved()[j]) {
 					units[9 * i + j] = hands[i].getBounds()[j][0];
@@ -140,7 +137,11 @@ public class AI extends Player {
 					continue;
 				}
 				for (int j = 0; j < 48; j++) {
-
+					if (hands[i].get(j) > max
+							&& hand.getSuit(j / 6).size() > 0) {
+						max = hands[i].get(j);
+						q = new Question(id, i, new Card(j));
+					}
 				}
 			}
 		}
