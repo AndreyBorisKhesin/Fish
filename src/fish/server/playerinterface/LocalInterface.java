@@ -1,5 +1,6 @@
 package fish.server.playerinterface;
 
+import fish.players.Human;
 import fish.players.Player;
 import fish.server.Server;
 import fish.server.messages.MDecStart;
@@ -9,7 +10,6 @@ import fish.server.messages.PMConnected;
 import fish.server.messages.PMGameState;
 import fish.server.messages.PMResponse;
 import fish.server.messages.PlayerMessage;
-import fish.server.messages.SMReady;
 
 /**
  * A player interface for a player connected locally. It is passed a player
@@ -39,6 +39,15 @@ public class LocalInterface extends PlayerInterface {
 	}
 
 	protected void processMessage(PlayerMessage pm) {
+		/*
+		 * print our messages if its a human, this is only a debug
+		 * feature
+		 */
+		// FIXME: remove
+		if (p instanceof Human) {
+			System.out.println("Received message: " + pm);
+		}
+
 		switch (pm.pmType()) {
 		case Q_ASKED:
 			p.questionAsked(((MQuestion) pm).q);

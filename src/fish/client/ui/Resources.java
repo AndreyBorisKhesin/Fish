@@ -3,6 +3,7 @@ package fish.client.ui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,10 +19,14 @@ public class Resources {
 
 	public static final Map<Card, BufferedImage> CARD_IMGS;
 	public static final Map<Team, BufferedImage> CARD_BACKS;
+	public static final Map<Integer, BufferedImage> SUIT_CARDS;
+	public static final Map<Integer, BufferedImage> SUIT_CARDS_GRAY;
 
 	static {
 		CARD_IMGS = new HashMap<Card, BufferedImage>();
 		CARD_BACKS = new HashMap<Team, BufferedImage>();
+		SUIT_CARDS = new HashMap<Integer, BufferedImage>();
+		SUIT_CARDS_GRAY = new HashMap<Integer, BufferedImage>();
 	}
 
 	private static final String FONT_LOC = "resources/gecko.ttf";
@@ -49,6 +54,18 @@ public class Resources {
 				UIUtil.loadImage("resources/cards/bb.png"));
 		CARD_BACKS.put(Team.RED,
 				UIUtil.loadImage("resources/cards/br.png"));
+
+		float s = 0.25f;
+		float o = 256 * (1-s);
+		RescaleOp grayOp = new RescaleOp(new float[] { s, s, s, 1 },
+				new float[] { o, o, o, 0 }, null);
+
+		for (int i = 0; i < 8; i++) {
+			SUIT_CARDS.put(i, CARD_IMGS.get(new Card(i,
+					i % 2 == 0 ? 0 : 5)));
+			SUIT_CARDS_GRAY.put(i,
+					grayOp.filter(SUIT_CARDS.get(i), null));
+		}
 	}
 
 }

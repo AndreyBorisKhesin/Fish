@@ -8,7 +8,6 @@ import fish.players.AI;
 import fish.players.Player;
 import fish.server.messages.PlayerMessage;
 import fish.server.messages.SMConnection;
-import fish.server.messages.SMReady;
 import fish.server.messages.ServerMessage;
 import fish.server.playerinterface.LocalInterface;
 import fish.server.playerinterface.PlayerInterface;

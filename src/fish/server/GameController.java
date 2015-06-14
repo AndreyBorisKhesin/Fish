@@ -12,6 +12,7 @@ import fish.Declaration;
 import fish.Question;
 import fish.Team;
 import fish.Util;
+import fish.client.test.GameTest;
 import fish.server.messages.MDecEnded;
 import fish.server.messages.MDecStart;
 import fish.server.messages.MDecUpdate;
@@ -87,6 +88,9 @@ public class GameController implements Controller {
 		dealDeck();
 
 		gs.turn = ServerUtil.rand.nextInt(s.clients.size());
+		// FIXME: remove this
+		if (GameTest.CHEATING)
+			gs.turn = 0;
 
 		sendGameState();
 		sendGameStart();
