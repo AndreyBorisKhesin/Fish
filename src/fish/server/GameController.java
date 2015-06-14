@@ -30,7 +30,7 @@ import fish.server.playerinterface.PlayerInterface;
  */
 public class GameController implements Controller {
 
-	public static final int RESPONSE_WAIT = 2000;
+	public static final int RESPONSE_WAIT = 5000;
 
 	/**
 	 * The server that the clients are connected to

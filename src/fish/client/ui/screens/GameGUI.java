@@ -11,8 +11,12 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +39,7 @@ public class GameGUI implements GUIScreen {
 	private DrawMode mode;
 
 	private static enum DrawMode {
-		WAIT_FOR_Q, DECLARATION, ASK_QUESTION, QUESTION_RESPONSE,
+		WAIT_FOR_Q, DECLARATION, ASK_QUESTION, QUESTION_ASKED, QUESTION_RESPONSE,
 	}
 
 	private int w, h;
@@ -51,6 +55,12 @@ public class GameGUI implements GUIScreen {
 	/* state variables for ASK_QUESTION */
 	private double cardscale = 1.5;
 
+	/* state variables for QUESTION_ASKED */
+	private Question question;
+
+	/* state variables for QUESTION_RESPONSE */
+	private boolean qcorrect;
+
 	private static enum AskMode {
 		SUIT, RANK
 	}
@@ -61,8 +71,6 @@ public class GameGUI implements GUIScreen {
 
 	private int suitselection;
 	private int rankselection;
-
-	private int askee;
 
 	public GameGUI(FishGUI gui) {
 		this.gui = gui;
@@ -81,6 +89,11 @@ public class GameGUI implements GUIScreen {
 	 */
 	public void setPlayer(Human p) {
 		this.p = p;
+	}
+
+	public void question(Question q) {
+		this.question = q;
+		this.switchMode(DrawMode.QUESTION_ASKED);
 	}
 
 	private void switchMode(DrawMode mode) {
@@ -115,6 +128,8 @@ public class GameGUI implements GUIScreen {
 		case ASK_QUESTION:
 			drawAskQuestion(g);
 			break;
+		case QUESTION_ASKED:
+			drawQuestionAsked(g);
 		}
 
 		g.clearRect(gw, 0, w - gw, h);
@@ -355,6 +370,129 @@ public class GameGUI implements GUIScreen {
 		}
 	}
 
+	private void drawQuestionAsked(Graphics2D g) {
+		question = new Question(5, 1, question.c);
+		int width = 400;
+		int height = 200;
+
+		double s = getLayoutScale(p.others.size());
+		int lef = (int) (s * 96. / 2 + 60) + width / 2;
+		int rit = gw - lef;
+		int top = (int) (s * 96. / 2 + 60) + height / 2;
+		int bot = h - (int) (2.5 * 96. / 2 + 80) - height / 2;
+
+		/*
+		 * the layout of the person asking, set it to ourselves by
+		 * default
+		 */
+		Layout l = new Layout(0.5, 1, 0);
+		for (OtherPlayerData d : p.others) {
+			if (d.id == p.id)
+				continue;
+			if (d.id == question.source) {
+				l = getLayoutSet(p.others.size())[(d.seat
+						- p.seat - 1 + p.others.size())
+						% p.others.size()];
+			}
+		}
+
+		int lx = (int) (l.x * gw);
+		int ly = (int) (l.y * h);
+
+		/* place to point the arrow at */
+		int tx = lx;
+		int ty = ly;
+
+		switch (l.rot) {
+		case 0:
+			ty -= 2.5 * 96 / 2;
+			break;
+		case 1:
+			tx += s * 96 / 2;
+			break;
+		case 2:
+			ty += s * 96 / 2;
+			break;
+		case 3:
+			tx -= s * 96 / 2;
+			break;
+		}
+
+		int cx = Math.max(Math.min(lx, rit), lef);
+		int cy = Math.max(Math.min(ly, bot), top);
+
+		AffineTransform xform = new AffineTransform();
+		xform.translate(cx, cy);
+		xform.translate(-width / 2, -height / 2);
+
+		Shape box = new RoundRectangle2D.Double(0, 0, width, height,
+				20, 20);
+
+		/* the vector from the centre of the box to the target */
+		double vx = tx - cx;
+		double vy = ty - cy;
+
+		double mag = Math.sqrt(vx * vx + vy * vy);
+
+		final double perplen = 50;
+		final double shorten = 40;
+
+		double px = vy / mag * perplen;
+		double py = -vx / mag * perplen;
+
+		vx *= (mag - shorten) / mag;
+		vy *= (mag - shorten) / mag;
+
+		double ox = width / 2;
+		double oy = height / 2;
+
+		Path2D triangle = new Path2D.Double();
+		triangle.moveTo(ox + vx, oy + vy);
+		triangle.lineTo(ox + px, oy + py);
+		triangle.lineTo(ox - px, oy - py);
+		triangle.closePath();
+
+		Area bubble = new Area(box);
+
+		bubble.add(new Area(triangle));
+
+		g.setTransform(xform);
+		/* draw the inside */
+		g.setColor(Color.WHITE);
+		g.fill(bubble);
+		/* draw the outside */
+		g.setColor(Color.BLACK);
+		Stroke orig = g.getStroke();
+		g.setStroke(new BasicStroke(2f));
+		g.draw(bubble);
+		g.setStroke(orig);
+
+		/* now draw inside the box */
+
+		float qscale = 1.5f;
+		g.setFont(Resources.GAME_FONT.deriveFont(135f * qscale));
+		FontMetrics fm0 = g.getFontMetrics();
+		g.drawString("?", width - fm0.stringWidth("?") - 5, height / 2
+				+ fm0.getAscent() / 2);
+		g.drawImage(new AffineTransformOp(AffineTransform
+				.getScaleInstance(qscale, qscale), null)
+				.filter(Resources.CARD_IMGS.get(question.c),
+						null),
+				(int) (width - fm0.stringWidth("?") - 71
+						* qscale - 10),
+				(int) (height / 2 - 96 * qscale / 2), null);
+
+		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		FontMetrics fm1 = g.getFontMetrics();
+		String uname = p.others.get(question.dest).uname;
+		g.drawString(uname, (int) (width - fm0.stringWidth("?") - 71
+				* qscale - 10)
+				/ 2 - fm1.stringWidth(uname) / 2, height / 2
+				+ fm1.getAscent() / 2);
+
+		g.setTransform(new AffineTransform());
+	}
+
 	/**
 	 * Buffer used for the function below, we scale it up by 10 so we can
 	 * later downsize it to the right size without the text looking blocky
@@ -580,11 +718,9 @@ public class GameGUI implements GUIScreen {
 		if (p.turn == p.id && selection != -1) {
 			for (OtherPlayerData d : p.others) {
 				if (d.id == selection && d.t == p.team) {
-					break;
+					return;
 				}
 			}
-
-			askee = selection;
 
 			rankselection = -1;
 			suitselection = -1;

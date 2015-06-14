@@ -33,7 +33,7 @@ public class Human extends Player {
 
 	@Override
 	public void questionAsked(Question q) {
-		// gui.question(q);
+		gui.question(q);
 	}
 
 	@Override
