@@ -13,6 +13,8 @@ public class AI extends Player {
 
 	private static int nameCounter = 0;
 
+	private List<Question> questions;
+
 	private Question q;
 
 	public AI(String s) {
@@ -156,8 +158,7 @@ public class AI extends Player {
 
 	@Override
 	public void questionAsked(Question q) {
-		// TODO implement
-
+		questions.add(q);
 	}
 
 	@Override
