@@ -40,7 +40,7 @@ public class QuantumHand {
 	 * Default QuantumHand constructor.
 	 * Contains each Card with equal probability.
 	 */
-	public QuantumHand() {
+	public QuantumHand(int numPlayers) {
 		for (int i = 0; i < 8; i++) {
 			quantumHand[i] = new HashMap<>();
 			bounds[i][0] = 0;
@@ -48,7 +48,7 @@ public class QuantumHand {
 		}
 		quantumHand[8] = new HashMap<>();
 		for (int i = 0; i < 48; i++) {
-			quantumHand[8].put(new Card(i), 1d / 6);
+			quantumHand[8].put(new Card(i), 1d / numPlayers);
 		}
 	}
 

@@ -16,12 +16,20 @@ public class AI extends Player {
 	private Question q;
 
 	public AI(String s) {
-		/*FIXME need an argument for number of players
-		hands = new QuantumHand[THAT NUMBER];
-		hands[id] = new QuantumHand(hand);*/
 		this.name = s;
 	}
 
+	private void instantiate(int numPlayers) {
+		hands = new QuantumHand[numPlayers];
+		for(int i = 0; i < numPlayers; i++) {
+			if(i == this.id) continue;
+			hands[i] = new QuantumHand(numPlayers);
+		}
+		hands[id] = new QuantumHand(this.hand);
+		
+		// FIXME: rebalance();
+	}
+	
 	@Override
 	public void questionResponse(Question q, boolean ans) {
 		if (hands[q.source].getHand().getSuit(q.c.suit).size() == 0) {
@@ -151,7 +159,11 @@ public class AI extends Player {
 	public void updateGameState(PlayerState p,
 			List<OtherPlayerData> others,
 			Map<Integer, Team> tricks, int turn, Declaration dec) {
-		// TODO implement
+		super.updateGameState(p, others, tricks, turn, dec);
+		
+		if(this.hands == null) {
+			instantiate(others.size());
+		}
 	}
 
 	@Override
