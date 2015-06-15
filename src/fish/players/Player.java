@@ -66,8 +66,7 @@ public abstract class Player {
 
 	public abstract void decUpdated(Declaration d);
 
-	public abstract void decEnded(Declaration d, int[] locs,
-			boolean succeeded);
+	public abstract void decEnded(Declaration d, int[] locs, boolean succeeded);
 
 	public abstract void connected();
 }
