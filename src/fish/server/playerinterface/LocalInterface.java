@@ -39,15 +39,6 @@ public class LocalInterface extends PlayerInterface {
 	}
 
 	protected void processMessage(PlayerMessage pm) {
-		/*
-		 * print our messages if its a human, this is only a debug
-		 * feature
-		 */
-		// FIXME: remove
-		if (p instanceof Human) {
-			System.out.println("Received message: " + pm);
-		}
-
 		switch (pm.pmType()) {
 		case Q_ASKED:
 			p.questionAsked(((MQuestion) pm).q);

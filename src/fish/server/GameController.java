@@ -129,8 +129,6 @@ public class GameController implements Controller {
 			PMGameState pk = new PMGameState(ps, gs.declared,
 					others, gs.turn);
 
-			System.out.println(pk);
-
 			gs.players.get(i).i.insertMessage(pk);
 		}
 	}
@@ -141,6 +139,8 @@ public class GameController implements Controller {
 
 	@Override
 	public void handleMessage(ServerMessage sm) {
+		System.out.println("Message received: " + sm);
+
 		switch (sm.smType()) {
 		case Q_ASKED:
 			questionAsked((MQuestion) sm);
@@ -190,13 +190,6 @@ public class GameController implements Controller {
 			e.printStackTrace();
 		}
 
-		/* print all hands */// FIXME: remove
-		System.out.println("Before:");
-		for (int i = 0; i < gs.players.size(); i++) {
-			System.out.println(i + ","
-					+ gs.players.get(i).i.getUname() + ": "
-					+ gs.players.get(i).s.hand);
-		}
 		/* now we resolve the question and send the result */
 		Question q = sm.q;
 		boolean res = gs.players.get(q.dest).s.hand.contains(q.c);
@@ -210,14 +203,6 @@ public class GameController implements Controller {
 			addEvent(s.getUname(sm.q.dest) + " does not have the "
 					+ q.c.humanRep());
 			gs.turn = q.dest;
-		}
-
-		// FIXME: remove
-		System.out.println("After:");
-		for (int i = 0; i < gs.players.size(); i++) {
-			System.out.println(i + ","
-					+ gs.players.get(i).i.getUname() + ": "
-					+ gs.players.get(i).s.hand);
 		}
 
 		checkEndgameState();

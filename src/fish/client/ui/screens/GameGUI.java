@@ -115,6 +115,16 @@ public class GameGUI extends GUIScreen {
 	public void question(Question q) {
 		this.question = q;
 		this.switchMode(DrawMode.QUESTION_ASKED);
+
+		/*
+		 * we need to hang here to make sure the player sees the
+		 * question
+		 */
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void response(boolean correct) {
@@ -125,7 +135,7 @@ public class GameGUI extends GUIScreen {
 
 	private void renderResponse(boolean correct) {
 		double step = 0.025;
-		double time = 5.;
+		double time = 3.;
 
 		if (correct) {
 			/* find the layout of the aske[re] */
@@ -256,7 +266,7 @@ public class GameGUI extends GUIScreen {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
-		long start = System.currentTimeMillis();
+		// long start = System.currentTimeMillis();
 		this.w = w;
 		this.h = h;
 		this.gw = w - 250;
@@ -285,7 +295,7 @@ public class GameGUI extends GUIScreen {
 
 		g.clearRect(gw, 0, w - gw, h);
 
-		System.out.println(System.currentTimeMillis() - start);
+		// System.out.println(System.currentTimeMillis() - start);
 	}
 
 	/**
@@ -312,7 +322,7 @@ public class GameGUI extends GUIScreen {
 			int handheight = (int) ((96 / 2) * cardScale);
 
 			/* if it is your turn draw an outline around your hand */
-			if (p.turn == p.id) {
+			if (p.turn == p.id && mode == DrawMode.WAIT_FOR_Q) {
 				g.setColor(Resources.GLOW);
 				g.fillRoundRect(gw / 2 - handwidth / 2 - 40, h
 						- handheight - 65,
@@ -388,7 +398,8 @@ public class GameGUI extends GUIScreen {
 
 				g.setTransform(xform);
 				/* if it's their turn draw the glow */
-				if (d.id == p.turn) {
+				if (d.id == p.turn
+						&& mode == DrawMode.WAIT_FOR_Q) {
 					g.setColor(Resources.GLOW);
 					g.fillRoundRect(-10, -10, 71 + 10 * 2,
 							96 + 10 * 2, 10, 10);

@@ -82,10 +82,11 @@ public class QuantumHand {
 
 	public void fix(Card c) {
 		if (!isZero(this.get(c))) {
-			bounds[suit(c)][0]--;
-			bounds[suit(c)][1]--;
 			if (c.suit == 8) {
 				genericCardNum--;
+			} else {
+				bounds[c.suit][0]--;
+				bounds[c.suit][1]--;
 			}
 		}
 		hand.add(c);

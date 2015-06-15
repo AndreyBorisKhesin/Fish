@@ -23,30 +23,27 @@ public class AI extends Player {
 		q = null;
 		//certain cards
 		l: for (int i = 0; i < hands.length; i++) {
-			if (i == id) {
+			if (i == id || others.get(i).t == this.team) {
 				continue;
 			}
 			for (Card c : hands[i].getHand().getCards()) {
 				if (hand.getSuit(c.suit).size() > 0) {
-					q = new Question(id, i, c);
-					break l;
+					return new Question(id, i, c);
 				}
 			}
 		}
 		//ask for most likely card
 		// FIXME battles and bluffing
-		if (q == null) {
-			double max = 0;
-			for (int i = 0; i < hands.length; i++) {
-				if (i == id) {
-					continue;
-				}
-				for (int j = 0; j < 48; j++) {
-					if (hands[i].get(j) > max &&
-							hand.getSuit(j / 6).size() > 0) {
-						max = hands[i].get(j);
-						q = new Question(id, i, new Card(j));
-					}
+		double max = 0;
+		for (int i = 0; i < hands.length; i++) {
+			if (i == id || others.get(i).t == this.team) {
+				continue;
+			}
+			for (int j = 0; j < 48; j++) {
+				if (hands[i].get(j) > max &&
+						hand.getSuit(j / 6).size() > 0) {
+					max = hands[i].get(j);
+					q = new Question(id, i, new Card(j));
 				}
 			}
 		}
@@ -186,7 +183,7 @@ public class AI extends Player {
 		}
 		//decides on a question
 		if (this.id == this.turn) {
-			ask();
+			pi.sendQuestion(ask());
 		}
 	}
 
