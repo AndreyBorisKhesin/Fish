@@ -84,10 +84,6 @@ public class AI extends Player {
 			hands[q.dest].zero(q.c);
 		}
 		rebalance();
-		//decides on a question
-		if (this.id == this.turn) {
-			ask();
-		}
 	}
 
 	private void rebalance() {
@@ -187,6 +183,10 @@ public class AI extends Player {
 		super.updateGameState(p, others, tricks, turn, dec);
 		if (this.hands == null) {
 			instantiate(others.size());
+		}
+		//decides on a question
+		if (this.id == this.turn) {
+			ask();
 		}
 	}
 
