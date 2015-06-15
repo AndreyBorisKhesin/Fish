@@ -10,7 +10,7 @@ import fish.client.ui.elements.Button;
 import fish.client.ui.elements.RadioButton;
 import fish.client.ui.elements.UIElement;
 
-public class LocalGameSetup implements GUIScreen {
+public class LocalGameSetup extends GUIScreen {
 
 	private RadioButton numAI;
 
@@ -23,6 +23,7 @@ public class LocalGameSetup implements GUIScreen {
 	private ClientMaster cm;
 
 	public LocalGameSetup(FishGUI gui, ClientMaster cm) {
+		super(gui);
 		numAI = new RadioButton(200, 200, "Number of Players:",
 				new String[] { "4", "6", "8", "12" },
 				this::setSelection);
@@ -57,23 +58,19 @@ public class LocalGameSetup implements GUIScreen {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
+	public void mousePressed(int x, int y, int button) {
 		for (UIElement el : elements) {
-			if (e.getButton() == MouseEvent.BUTTON1) {
+			if (button == MouseEvent.BUTTON1) {
 				el.mouseLeftClick(x, y, gui);
 			}
-			if (e.getButton() == MouseEvent.BUTTON2) {
+			if (button == MouseEvent.BUTTON2) {
 				el.mouseRightClick(x, y, gui);
 			}
 		}
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
+	public void mouseMoved(int x, int y) {
 		for (UIElement el : elements) {
 			el.mouseMoved(x, y, gui);
 		}

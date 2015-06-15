@@ -19,7 +19,7 @@ import fish.client.ui.elements.MainMenuButton;
  * The interface used to allow the player to select game mode, etc.
  *
  */
-public class MainMenu implements GUIScreen {
+public class MainMenu extends GUIScreen {
 
 	private MainMenuButton[] buttons;
 
@@ -28,6 +28,7 @@ public class MainMenu implements GUIScreen {
 	private List<Card> deck;
 
 	public MainMenu(ClientMaster c, FishGUI g) {
+		super(g);
 		initButtons(c);
 		this.g = g;
 		this.deck = Util.deck();
@@ -93,11 +94,9 @@ public class MainMenu implements GUIScreen {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
+	public void mousePressed(int x, int y, int button) {
 		for (Button b : buttons) {
-			switch (e.getButton()) {
+			switch (button) {
 			case MouseEvent.BUTTON1:
 				b.mouseLeftClick(x, y, g);
 				break;
@@ -109,9 +108,7 @@ public class MainMenu implements GUIScreen {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		int x = e.getX();
-		int y = e.getY();
+	public void mouseMoved(int x, int y) {
 		for (Button b : buttons) {
 			b.mouseMoved(x, y, g);
 		}

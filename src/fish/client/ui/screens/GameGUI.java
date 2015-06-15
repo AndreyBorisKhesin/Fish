@@ -31,7 +31,7 @@ import fish.client.ui.Resources;
 import fish.players.Human;
 import fish.server.OtherPlayerData;
 
-public class GameGUI implements GUIScreen {
+public class GameGUI extends GUIScreen {
 
 	private FishGUI gui;
 
@@ -93,6 +93,7 @@ public class GameGUI implements GUIScreen {
 	private int rankselection;
 
 	public GameGUI(FishGUI gui) {
+		super(gui);
 		this.gui = gui;
 
 		mode = DrawMode.WAIT_FOR_Q;
@@ -849,7 +850,7 @@ public class GameGUI implements GUIScreen {
 		float qscale = 0.6f;
 		g.setFont(Resources.GAME_FONT.deriveFont(135f * qscale));
 		FontMetrics fm = g.getFontMetrics();
-		g.drawString("NO", width / 2 - fm.stringWidth("NO") / 2, height
+		g.drawString("No", width / 2 - fm.stringWidth("No") / 2, height
 				/ 2 + fm.getAscent() / 2);
 
 		g.setTransform(new AffineTransform());
@@ -910,9 +911,9 @@ public class GameGUI implements GUIScreen {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		mx = e.getX();
-		my = e.getY();
+	public void mouseMoved(int x, int y) {
+		mx = x;
+		my = y;
 
 		mouseMoved();
 	}
@@ -1061,8 +1062,8 @@ public class GameGUI implements GUIScreen {
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		if (e.getButton() != MouseEvent.BUTTON1) {
+	public void mousePressed(int x, int y, int button) {
+		if (button != MouseEvent.BUTTON1) {
 			return;
 		}
 

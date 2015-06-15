@@ -11,7 +11,7 @@ import fish.client.ui.FishGUI;
  * Displays while cards and other similar things are loading into the game
  *
  */
-public class Loader implements Runnable, GUIScreen {
+public class Loader extends GUIScreen implements Runnable {
 
 	private final double INCREMENT = 0.625 * 2;
 	private final int FLIP_INCREMENT = 5 * 2;
@@ -31,7 +31,7 @@ public class Loader implements Runnable, GUIScreen {
 	private Graphics2D bufg;
 
 	private Thread thread;
-	
+
 	/**
 	 * Position around the octagon, in degrees
 	 */
@@ -43,6 +43,7 @@ public class Loader implements Runnable, GUIScreen {
 	private FishGUI gui;
 
 	public Loader(FishGUI gui) {
+		super(gui);
 		buf = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		bufg = (Graphics2D) buf.getGraphics();
 		bufg.setBackground(new Color(0, 0, 0, 0));
@@ -61,18 +62,19 @@ public class Loader implements Runnable, GUIScreen {
 	}
 
 	public void go() {
-		if(thread != null) {
-			throw new RuntimeException("Already running loader was told to run");
+		if (thread != null) {
+			throw new RuntimeException(
+					"Already running loader was told to run");
 		}
 		thread = new Thread(this);
 		thread.start();
 	}
-	
+
 	public void end() {
 		thread.interrupt();
 		thread = null;
 	}
-	
+
 	private void drawBuf() {
 		bufg.setTransform(new AffineTransform());
 		bufg.clearRect(0, 0, size, size);
@@ -127,7 +129,7 @@ public class Loader implements Runnable, GUIScreen {
 	private void tick() {
 		pos = (pos + INCREMENT) % 360;
 		flipPos += FLIP_INCREMENT;
-		if(flipPos >= 90 && flipPos - FLIP_INCREMENT < 90) {
+		if (flipPos >= 90 && flipPos - FLIP_INCREMENT < 90) {
 			colors[flipIdx] = colors[(flipIdx + 7) % 8];
 		}
 		if (flipPos >= 180) {

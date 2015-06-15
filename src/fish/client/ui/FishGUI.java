@@ -4,8 +4,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
@@ -24,6 +25,9 @@ public class FishGUI extends JPanel {
 	private Graphics2D bufg;
 	public GUIScreen guiScreen;
 
+	public AffineTransform scale;
+	public AffineTransform inverseScale;
+
 	public FishGUI() {
 		frame = new JFrame("Fish");
 		cpane = frame.getContentPane();
@@ -34,16 +38,15 @@ public class FishGUI extends JPanel {
 
 		frame.add(this);
 
-		setSize(Resolution._1280_720);
-
 		/* set up the drawing environment */
-		buf = new BufferedImage(size.d.width, size.d.height,
-				BufferedImage.TYPE_INT_ARGB);
+		buf = new BufferedImage(1280, 720, BufferedImage.TYPE_INT_ARGB);
 		bufg = (Graphics2D) buf.getGraphics();
 		bufg.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		bufg.setBackground(new Color(0x00, 0xce, 0xd1));
+
+		setSize(Resolution._1024_576);
 
 		/* placing of things */
 		cpane.setLayout(null);
@@ -59,7 +62,7 @@ public class FishGUI extends JPanel {
 	public void start() {
 		frame.setVisible(true);
 	}
-	
+
 	public void switchMode(GUIScreen screen) {
 		this.removeMouseListener(guiScreen);
 		this.removeMouseMotionListener(guiScreen);
@@ -74,6 +77,14 @@ public class FishGUI extends JPanel {
 		cpane.setSize(r.d);
 		cpane.setPreferredSize(r.d);
 		this.setBounds(0, 0, r.d.width, r.d.height);
+		this.scale = AffineTransform.getScaleInstance(r.d.width
+				/ (double) buf.getWidth(), r.d.height
+				/ (double) buf.getHeight());
+		try {
+			this.inverseScale = scale.createInverse();
+		} catch (NoninvertibleTransformException e) {
+			e.printStackTrace();
+		}
 		frame.pack();
 	}
 
@@ -86,8 +97,7 @@ public class FishGUI extends JPanel {
 					buf.getHeight());
 		}
 
-		g.drawImage(buf.getScaledInstance(size.d.width, size.d.height,
-				Image.SCALE_FAST), 0, 0, null);
+		((Graphics2D) g).drawImage(buf, scale, null);
 	}
 
 	public void redraw() {
