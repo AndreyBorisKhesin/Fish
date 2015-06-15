@@ -92,7 +92,7 @@ public final class Matrix {
 			for (int j = 0; j < product[0].length; j++) {
 				for (int k = 0; k < m[0].length; k++) {
 					product[i][j] +=
-							m[i][k] * m[k][j];
+							m[i][k] * matrix.m[k][j];
 				}
 			}
 		}
