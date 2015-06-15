@@ -19,6 +19,40 @@ public class AI extends Player {
 		this.name = s;
 	}
 
+	private Question ask() {
+		q = null;
+		//certain cards
+		l: for (int i = 0; i < hands.length; i++) {
+			if (i == id) {
+				continue;
+			}
+			for (Card c : hands[i].getHand().getCards()) {
+				if (hand.getSuit(c.suit).size() > 0) {
+					q = new Question(id, i, c);
+					break l;
+				}
+			}
+		}
+		//ask for most likely card
+		// FIXME battles and bluffing
+		if (q == null) {
+			double max = 0;
+			for (int i = 0; i < hands.length; i++) {
+				if (i == id) {
+					continue;
+				}
+				for (int j = 0; j < 48; j++) {
+					if (hands[i].get(j) > max &&
+							hand.getSuit(j / 6).size() > 0) {
+						max = hands[i].get(j);
+						q = new Question(id, i, new Card(j));
+					}
+				}
+			}
+		}
+		return q;
+	}
+
 	private void instantiate(int numPlayers) {
 		hands = new QuantumHand[numPlayers];
 		for (int i = 0; i < numPlayers; i++) {
@@ -27,7 +61,7 @@ public class AI extends Player {
 			}
 			hands[i] = new QuantumHand(numPlayers);
 		}
-		//FIXME: rebalance();
+		rebalance();
 		questions = new ArrayList<Question>();
 	}
 
@@ -49,6 +83,14 @@ public class AI extends Player {
 			// FIXME battles and bluffing
 			hands[q.dest].zero(q.c);
 		}
+		rebalance();
+		//decides on a question
+		if (this.id == this.turn) {
+			ask();
+		}
+	}
+
+	private void rebalance() {
 		//readjust all the bounds on the cards
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < hands.length; j++) {
@@ -137,42 +179,10 @@ public class AI extends Player {
 				}
 			}
 		} while (b);
-		//decides on a question
-		q = null;
-		//certain cards
-		l: for (int i = 0; i < hands.length; i++) {
-			if (i == id) {
-				continue;
-			}
-			for (Card c : hands[i].getHand().getCards()) {
-				if (hand.getSuit(c.suit).size() > 0) {
-					q = new Question(id, i, c);
-					break l;
-				}
-			}
-		}
-		//most likely cards
-		// FIXME battles and bluffing
-		if (q == null) {
-			double max = 0;
-			for (int i = 0; i < hands.length; i++) {
-				if (i == id) {
-					continue;
-				}
-				for (int j = 0; j < 48; j++) {
-					if (hands[i].get(j) > max &&
-							hand.getSuit(j / 6).size() > 0) {
-						max = hands[i].get(j);
-						q = new Question(id, i, new Card(j));
-					}
-				}
-			}
-		}
 	}
 
 	@Override
-	public void updateGameState(PlayerState p,
-			List<OtherPlayerData> others,
+	public void updateGameState(PlayerState p, List<OtherPlayerData> others,
 			Map<Integer, Team> tricks, int turn, Declaration dec) {
 		super.updateGameState(p, others, tricks, turn, dec);
 		if (this.hands == null) {
