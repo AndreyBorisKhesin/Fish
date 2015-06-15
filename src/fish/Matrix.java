@@ -47,7 +47,7 @@ public final class Matrix {
 				result[i][i] = units[i] / vector[i];
 			}
 		}
-		return this.x(new Matrix(result));
+		return new Matrix(result).x(this);
 	}
 
 	public Matrix diagonalReciprocal(double[] vector) {
