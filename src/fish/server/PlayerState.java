@@ -43,13 +43,14 @@ public class PlayerState {
 	 * @param id The ID of the Player.
 	 * @param name The name of the Player.
 	 * @param team The Team of the Player.
+	 * @param hand The hand this player holds
 	 */
-	PlayerState(int id, int seat, String name, Team team) {
+	PlayerState(int id, int seat, String name, Team team, Hand hand) {
 		this.id = id;
 		this.seat = seat;
 		this.name = name;
 		this.team = team;
-		hand = new Hand();
+		this.hand = hand;
 	}
 
 	/**

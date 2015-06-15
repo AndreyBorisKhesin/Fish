@@ -139,8 +139,10 @@ public class GameGUI implements GUIScreen {
 			flipxform.translate(-710, 0);
 			AffineTransformOp flip = new AffineTransformOp(
 					flipxform, null);
-			
-			this.middleI = Resources.scaleImage(Resources.CARD_IMGS.get(question.c), 10);
+
+			this.middleI = Resources
+					.scaleImage(Resources.CARD_IMGS
+							.get(question.c), 10);
 
 			if (question.dest == p.id) {
 				startI = this.middleI;
@@ -155,6 +157,13 @@ public class GameGUI implements GUIScreen {
 				startI = flip.filter(
 						drawCardBack(d.t, d.numCards,
 								l.rot), null);
+
+				/*
+				 * render the underlying player card as
+				 * having one less card
+				 */
+				d.numCards--;
+
 			}
 			if (question.source == p.id) {
 				/*
@@ -184,8 +193,8 @@ public class GameGUI implements GUIScreen {
 			middlexform.translate(gw / 2, h / 2);
 			double scale = 2.5;
 			middlexform.scale(scale, scale);
-			middlexform.translate(-71./2, -96./2);
-			
+			middlexform.translate(-71. / 2, -96. / 2);
+
 			/* the images are 10x size */
 			startxform.scale(0.1, 0.1);
 			endxform.scale(0.1, 0.1);
@@ -282,6 +291,11 @@ public class GameGUI implements GUIScreen {
 	 * Draws the basic parts of the game such as your and others' hands
 	 */
 	private void drawBasicGame(Graphics2D g) {
+		drawOpponents(g);
+		drawHand(g);
+	}
+
+	private void drawHand(Graphics2D g) {
 		/* draw your hand */
 		{
 			/* amount the card drawing is scaled by */
@@ -311,20 +325,35 @@ public class GameGUI implements GUIScreen {
 					- handheight - 20, handwidth + 20 * 2,
 					handheight + 20 * 2, 20, 20);
 
-			for (Card c : p.hand.getCardsSorted()) {
-				g.drawImage(Resources.CARD_IMGS.get(c),
-						transform, null);
-				transform.translate(12, 0);
-			}
-
 			/* draw your name */
+			/*
+			 * this must be before the cards so that transferring
+			 * cards do not slide underneath it
+			 */
 			g.setFont(Resources.GAME_FONT.deriveFont(40f));
 			FontMetrics fm = g.getFontMetrics();
 			g.setColor(Color.BLACK);
 			g.drawString(p.name, gw / 2 - handwidth / 2, h
 					- handheight - 20 - fm.getDescent() + 1);
-		}
 
+			for (Card c : p.hand.getCardsSorted()) {
+				/*
+				 * if the card is being transferred draw the
+				 * transferring version instead
+				 */
+				if (mode == DrawMode.QUESTION_RESPONSE
+						&& qcorrect && c == question.c) {
+					drawQuestionResponseRight(g);
+				} else {
+					g.drawImage(Resources.CARD_IMGS.get(c),
+							transform, null);
+				}
+				transform.translate(12, 0);
+			}
+		}
+	}
+
+	private void drawOpponents(Graphics2D g) {
 		/* create a list containing players at the table in sorted order */
 		List<OtherPlayerData> table = new ArrayList<>();
 		table.addAll(p.others);
@@ -674,6 +703,9 @@ public class GameGUI implements GUIScreen {
 
 	private void drawQuestionResponse(Graphics2D g) {
 		if (qcorrect) {
+			/* its already been redrawn */
+			if (p.hand.contains(question.c))
+				return;
 			drawQuestionResponseRight(g);
 		} else {
 			drawQuestionResponseWrong(g);
