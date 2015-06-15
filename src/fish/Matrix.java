@@ -61,7 +61,9 @@ public final class Matrix {
 	public double[] sum() {
 		double[] sum = new double[m.length];
 		for (int i = 0; i < sum.length; i++) {
-			sum[i] = Arrays.stream(m[i]).filter(x -> !isZero(x - 1)).sum();
+			//sum[i] = Arrays.stream(m[i]).filter(x -> !isZero(x - 1)).sum();
+			//the above is to be uncommented if the line below is inadequate
+			sum[i] = Arrays.stream(m[i]).sum();
 		}
 		return sum;
 	}
