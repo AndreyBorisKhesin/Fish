@@ -2,8 +2,12 @@ package fish.client.ui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.RescaleOp;
+import java.awt.image.WritableRaster;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +60,7 @@ public class Resources {
 				UIUtil.loadImage("resources/cards/br.png"));
 
 		float s = 0.25f;
-		float o = 256 * (1-s);
+		float o = 256 * (1 - s);
 		RescaleOp grayOp = new RescaleOp(new float[] { s, s, s, 1 },
 				new float[] { o, o, o, 0 }, null);
 
@@ -66,6 +70,18 @@ public class Resources {
 			SUIT_CARDS_GRAY.put(i,
 					grayOp.filter(SUIT_CARDS.get(i), null));
 		}
+	}
+
+	public static BufferedImage copyImage(BufferedImage img) {
+		ColorModel cm = img.getColorModel();
+		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		WritableRaster raster = img.copyData(null);
+		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	}
+
+	public static BufferedImage scaleImage(BufferedImage img, double scale) {
+		return new AffineTransformOp(AffineTransform.getScaleInstance(
+				scale, scale), null).filter(img, null);
 	}
 
 }

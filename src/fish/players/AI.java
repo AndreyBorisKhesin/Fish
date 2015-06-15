@@ -23,20 +23,24 @@ public class AI extends Player {
 
 	private void instantiate(int numPlayers) {
 		hands = new QuantumHand[numPlayers];
-		for(int i = 0; i < numPlayers; i++) {
-			if(i == this.id) continue;
+		for (int i = 0; i < numPlayers; i++) {
+			if (i == this.id)
+				continue;
 			hands[i] = new QuantumHand(numPlayers);
 		}
 		hands[id] = new QuantumHand(this.hand);
-		
+
 		// FIXME: rebalance();
+
+		questions = new ArrayList<Question>();
 	}
-	
+
 	@Override
 	public void questionResponse(Question q, boolean ans) {
 		if (hands[q.source].getHand().getSuit(q.c.suit).size() == 0) {
-			hands[q.source].getBounds()[q.c.suit][0] =
-					Math.max(hands[q.source].getBounds()[q.c.suit][0], 1);
+			hands[q.source].getBounds()[q.c.suit][0] = Math
+					.max(hands[q.source].getBounds()[q.c.suit][0],
+							1);
 		}
 		if (ans) {
 			for (QuantumHand hand : hands) {
@@ -44,8 +48,8 @@ public class AI extends Player {
 			}
 			hands[q.dest].fix(q.c);
 		} else {
-			hands[q.source].zero(q.c);//TODO FIXME FIXME FIXME
-			//FIXME battles and bluffing
+			hands[q.source].zero(q.c);// TODO FIXME FIXME FIXME
+			// FIXME battles and bluffing
 			hands[q.dest].zero(q.c);
 		}
 		for (int i = 0; i < 8; i++) {
@@ -55,19 +59,27 @@ public class AI extends Player {
 					int max = 0;
 					for (int k = 0; k < hands.length; k++) {
 						if (k == id) {
-							min += hand.getSuit(i).size();
-							max += hand.getSuit(i).size();
+							min += hand.getSuit(i)
+									.size();
+							max += hand.getSuit(i)
+									.size();
 						} else if (k != j) {
-							min += hands[k].getHand().getSuit(i).size() +
-									hands[k].getBounds()[i][0];
-							max += hands[k].getHand().getSuit(i).size() +
-									hands[k].getBounds()[i][1];
+							min += hands[k].getHand()
+									.getSuit(i)
+									.size()
+									+ hands[k].getBounds()[i][0];
+							max += hands[k].getHand()
+									.getSuit(i)
+									.size()
+									+ hands[k].getBounds()[i][1];
 						}
 					}
-					hands[j].getBounds()[i][0] =
-							Math.max(hands[j].getBounds()[i][0], 8 - max);
-					hands[j].getBounds()[i][1] =
-							Math.min(hands[j].getBounds()[i][1], 8 - min);
+					hands[j].getBounds()[i][0] = Math
+							.max(hands[j].getBounds()[i][0],
+									8 - max);
+					hands[j].getBounds()[i][1] = Math
+							.min(hands[j].getBounds()[i][1],
+									8 - min);
 				}
 				hands[j].move(i);
 			}
@@ -101,21 +113,30 @@ public class AI extends Player {
 		Matrix matrix = new Matrix(array);
 		for (int i = 0; i < 20; i++) {
 			matrix = matrix.diagonalReciprocal(matrix.sum(), units);
-			matrix = matrix.t().diagonalReciprocal(matrix.t().sum()).t();
+			matrix = matrix.t()
+					.diagonalReciprocal(matrix.t().sum())
+					.t();
 		}
 		for (int i = 0; i < hands.length; i++) {
 			for (int j = 0; j < 9; j++) {
 				hands[i].getQuantumHand()[j].clear();
 				for (int k = 0; k < 48; k++) {
-					if (j == 8 && hands[i].getMoved()[new Card(k).suit]) {
+					if (j == 8
+							&& hands[i].getMoved()[new Card(
+									k).suit]) {
 						continue;
 					}
-					if (j != 8 && !hands[i].getMoved()[new Card(k).suit]) {
+					if (j != 8
+							&& !hands[i].getMoved()[new Card(
+									k).suit]) {
 						continue;
 					}
 					if (!isZero(matrix.m[9 * i + j][k])) {
-						hands[i].getQuantumHand()[j].put
-								(new Card(k), matrix.m[9 * i + j][k]);
+						hands[i].getQuantumHand()[j]
+								.put(new Card(k),
+										matrix.m[9
+												* i
+												+ j][k]);
 					}
 				}
 			}
@@ -139,7 +160,7 @@ public class AI extends Player {
 				}
 			}
 		}
-		//FIXME battles and bluffing
+		// FIXME battles and bluffing
 		if (q == null) {
 			double max = 0;
 			for (int i = 0; i < hands.length; i++) {
@@ -148,9 +169,11 @@ public class AI extends Player {
 				}
 				for (int j = 0; j < 48; j++) {
 					if (hands[i].get(j) > max
-							&& hand.getSuit(j / 6).size() > 0) {
+							&& hand.getSuit(j / 6)
+									.size() > 0) {
 						max = hands[i].get(j);
-						q = new Question(id, i, new Card(j));
+						q = new Question(id, i,
+								new Card(j));
 					}
 				}
 			}
@@ -162,8 +185,8 @@ public class AI extends Player {
 			List<OtherPlayerData> others,
 			Map<Integer, Team> tricks, int turn, Declaration dec) {
 		super.updateGameState(p, others, tricks, turn, dec);
-		
-		if(this.hands == null) {
+
+		if (this.hands == null) {
 			instantiate(others.size());
 		}
 	}

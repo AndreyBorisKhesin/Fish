@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntToDoubleFunction;
 
 import fish.Card;
 import fish.Question;
@@ -61,6 +62,25 @@ public class GameGUI implements GUIScreen {
 	/* state variables for QUESTION_RESPONSE */
 	private boolean qcorrect;
 
+	/* parameter for shifting the card into place */
+	/* 0->0.5: the back of the card with the old number and colour */
+	/* 0.5->1: the front of the card, ending at the centre of the screen */
+	/* 1->2 : wait for everyone to see it */
+	/* 2->2.5: the front of the card transitioning to new position */
+	/*
+	 * 2.5->3: the back of the card with the new number and colour, sliding
+	 * into place
+	 */
+	private double t;
+
+	/* the affine transform matrices we are interpolating between */
+	private double[] startX, middleX, endX;
+	/* the differences we are interpolating through */
+	private double[] diff1, diff2;
+
+	/* the images we are drawing */
+	private BufferedImage startI, middleI, endI;
+
 	private static enum AskMode {
 		SUIT, RANK
 	}
@@ -96,6 +116,122 @@ public class GameGUI implements GUIScreen {
 		this.switchMode(DrawMode.QUESTION_ASKED);
 	}
 
+	public void response(boolean correct) {
+		this.mode = DrawMode.QUESTION_RESPONSE;
+		this.qcorrect = correct;
+		renderResponse(correct);
+	}
+
+	private void renderResponse(boolean correct) {
+		double step = 0.025;
+		double time = 5.;
+
+		if (correct) {
+			/* find the layout of the aske[re] */
+			Layout askeeL = getPlayerLayout(question.source);
+			Layout askerL = getPlayerLayout(question.dest);
+
+			AffineTransform startxform = null;
+			AffineTransform endxform = null;
+
+			AffineTransform flipxform = AffineTransform
+					.getScaleInstance(-1, 1);
+			flipxform.translate(-710, 0);
+			AffineTransformOp flip = new AffineTransformOp(
+					flipxform, null);
+			
+			this.middleI = Resources.scaleImage(Resources.CARD_IMGS.get(question.c), 10);
+
+			if (question.dest == p.id) {
+				startI = this.middleI;
+				startxform = getPlayerCardXform(question.c);
+			} else {
+				startxform = getOpponentXform(askerL);
+				startxform.scale(-1, 1);
+				startxform.translate(-71, 0);
+
+				OtherPlayerData d = p.others.get(question.dest);
+				Layout l = getPlayerLayout(d.id);
+				startI = flip.filter(
+						drawCardBack(d.t, d.numCards,
+								l.rot), null);
+			}
+			if (question.source == p.id) {
+				/*
+				 * we should insert it into the hand now to make
+				 * space for it, the hand will be drawn as
+				 * invisible for it
+				 */
+				p.hand.add(question.c);
+
+				endxform = getPlayerCardXform(question.c);
+
+				endI = this.middleI;
+			} else {
+				endxform = getOpponentXform(askeeL);
+				/* the starting images are 10x size */
+				endxform.scale(-1, 1);
+				startxform.translate(-71, 0);
+
+				OtherPlayerData d = p.others.get(question.dest);
+				Layout l = getPlayerLayout(d.id);
+				startI = flip.filter(
+						drawCardBack(d.t, d.numCards,
+								l.rot), null);
+			}
+
+			AffineTransform middlexform = new AffineTransform();
+			middlexform.translate(gw / 2, h / 2);
+			double scale = 2.5;
+			middlexform.scale(scale, scale);
+			middlexform.translate(-71./2, -96./2);
+			
+			/* the images are 10x size */
+			startxform.scale(0.1, 0.1);
+			endxform.scale(0.1, 0.1);
+			middlexform.scale(0.1, 0.1);
+
+			this.startX = new double[6];
+			this.middleX = new double[6];
+			this.endX = new double[6];
+			this.diff1 = new double[6];
+			this.diff2 = new double[6];
+
+			startxform.getMatrix(startX);
+			middlexform.getMatrix(middleX);
+			endxform.getMatrix(endX);
+
+			for (int i = 0; i < 6; i++) {
+				diff1[i] = middleX[i] - startX[i];
+				diff2[i] = endX[i] - middleX[i];
+			}
+		}
+
+		gui.repaint();
+
+		t = 0;
+		while (t < 3 - 1e-9) {
+			long start = System.currentTimeMillis();
+			if (correct) {
+				gui.repaint();
+			}
+
+			long sleepTime = (long) ((time / (3 / step)) * 1000)
+					- (System.currentTimeMillis() - start);
+			if (sleepTime >= 0) {
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			t += step;
+		}
+
+		switchMode(DrawMode.WAIT_FOR_Q);
+	}
+
 	private void switchMode(DrawMode mode) {
 		this.mode = mode;
 		mouseMoved();
@@ -110,6 +246,7 @@ public class GameGUI implements GUIScreen {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
+		long start = System.currentTimeMillis();
 		this.w = w;
 		this.h = h;
 		this.gw = w - 250;
@@ -130,9 +267,15 @@ public class GameGUI implements GUIScreen {
 			break;
 		case QUESTION_ASKED:
 			drawQuestionAsked(g);
+			break;
+		case QUESTION_RESPONSE:
+			drawQuestionResponse(g);
+			break;
 		}
 
 		g.clearRect(gw, 0, w - gw, h);
+
+		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	/**
@@ -202,15 +345,8 @@ public class GameGUI implements GUIScreen {
 
 			/* draw the card */
 			{
-				AffineTransform xform = new AffineTransform();
-				/* translate to drawing location */
-				xform.translate(x, y);
-				/* rotate */
-				xform.quadrantRotate(l.rot);
-				/* scale card */
-				xform.scale(scale, scale);
-				/* translate to centre of card */
-				xform.translate(-71 / 2, -96 / 2);
+
+				AffineTransform xform = getOpponentXform(l);
 
 				/* if they are selected, indicate that */
 				if (mode == DrawMode.WAIT_FOR_Q
@@ -278,6 +414,52 @@ public class GameGUI implements GUIScreen {
 				g.setTransform(new AffineTransform());
 			}
 		}
+	}
+
+	private Layout getPlayerLayout(int id) {
+		if (id == p.id) {
+			return new Layout(0.5, 1, 0);
+		} else {
+			return getLayoutSet(p.others.size())[(p.others.get(id).seat
+					- p.seat - 1 + p.others.size())
+					% p.others.size()];
+		}
+	}
+
+	private AffineTransform getOpponentXform(Layout l) {
+		double scale = getLayoutScale(p.others.size());
+
+		int x = (int) (l.x * gw);
+		int y = (int) (l.y * h);
+
+		AffineTransform xform = new AffineTransform();
+		/* translate to drawing location */
+		xform.translate(x, y);
+		/* rotate */
+		xform.quadrantRotate(l.rot);
+		/* scale card */
+		xform.scale(scale, scale);
+		/* translate to centre of card */
+		xform.translate(-71 / 2, -96 / 2);
+
+		return xform;
+	}
+
+	private AffineTransform getPlayerCardXform(Card c) {
+		int pos = p.hand.getCardsSorted().indexOf(c);
+
+		/* amount the card drawing is scaled by */
+		double cardScale = 2.5;
+		int handwidth = (int) (((p.hand.getNumCards() - 1) * 12 + 71) * cardScale);
+		AffineTransform transform = new AffineTransform();
+
+		transform.translate(gw / 2 - handwidth / 2, h);
+		transform.scale(cardScale, cardScale);
+		/* the size of the cards in pixels */
+		transform.translate(0, -96 / 2);
+		transform.translate(12 * pos, 0);
+
+		return transform;
 	}
 
 	private void drawWaitForQuestion(Graphics2D g) {
@@ -371,7 +553,6 @@ public class GameGUI implements GUIScreen {
 	}
 
 	private void drawQuestionAsked(Graphics2D g) {
-		question = new Question(5, 1, question.c);
 		int width = 400;
 		int height = 200;
 
@@ -390,9 +571,7 @@ public class GameGUI implements GUIScreen {
 			if (d.id == p.id)
 				continue;
 			if (d.id == question.source) {
-				l = getLayoutSet(p.others.size())[(d.seat
-						- p.seat - 1 + p.others.size())
-						% p.others.size()];
+				l = getPlayerLayout(d.id);
 			}
 		}
 
@@ -489,6 +668,157 @@ public class GameGUI implements GUIScreen {
 				* qscale - 10)
 				/ 2 - fm1.stringWidth(uname) / 2, height / 2
 				+ fm1.getAscent() / 2);
+
+		g.setTransform(new AffineTransform());
+	}
+
+	private void drawQuestionResponse(Graphics2D g) {
+		if (qcorrect) {
+			drawQuestionResponseRight(g);
+		} else {
+			drawQuestionResponseWrong(g);
+
+		}
+	}
+
+	private void drawQuestionResponseRight(Graphics2D g) {
+		double[] xform = new double[6];
+		IntToDoubleFunction f;
+		if (t <= 1) {
+			f = i -> startX[i] + diff1[i] * t;
+		} else if (t <= 2) {
+			f = i -> middleX[i];
+		} else if (t <= 3) {
+			f = i -> middleX[i] + diff2[i] * (t - 2);
+		} else {
+			throw new IllegalArgumentException(
+					"t parameter is too large: " + t);
+		}
+
+		for (int i = 0; i < 6; i++) {
+			xform[i] = f.applyAsDouble(i);
+		}
+
+		BufferedImage img;
+
+		if (t <= 0.5) {
+			img = startI;
+		} else if (t <= 2.5) {
+			img = middleI;
+		} else if (t <= 3) {
+			img = endI;
+		} else {
+			throw new IllegalArgumentException(
+					"t parameter is too large: " + t);
+		}
+
+		g.drawImage(img, new AffineTransform(xform), null);
+	}
+
+	private void drawQuestionResponseWrong(Graphics2D g) {
+		/* we just draw a big no next to the person being asked */
+		/* copied from drawQuestionAsked */
+		int width = 100;
+		int height = 100;
+
+		double s = getLayoutScale(p.others.size());
+		int lef = (int) (s * 96. / 2 + 60) + width / 2;
+		int rit = gw - lef;
+		int top = (int) (s * 96. / 2 + 60) + height / 2;
+		int bot = h - (int) (2.5 * 96. / 2 + 80) - height / 2;
+
+		/*
+		 * the layout of the person asking, set it to ourselves
+		 * by
+		 * default
+		 */
+		Layout l = new Layout(0.5, 1, 0);
+		for (OtherPlayerData d : p.others) {
+			if (d.id == p.id)
+				continue;
+			if (d.id == question.dest) {
+				l = getPlayerLayout(d.id);
+			}
+		}
+
+		int lx = (int) (l.x * gw);
+		int ly = (int) (l.y * h);
+
+		/* place to point the arrow at */
+		int tx = lx;
+		int ty = ly;
+
+		switch (l.rot) {
+		case 0:
+			ty -= 2.5 * 96 / 2;
+			break;
+		case 1:
+			tx += s * 96 / 2;
+			break;
+		case 2:
+			ty += s * 96 / 2;
+			break;
+		case 3:
+			tx -= s * 96 / 2;
+			break;
+		}
+
+		int cx = Math.max(Math.min(lx, rit), lef);
+		int cy = Math.max(Math.min(ly, bot), top);
+
+		AffineTransform xform = new AffineTransform();
+		xform.translate(cx, cy);
+		xform.translate(-width / 2, -height / 2);
+
+		Shape box = new RoundRectangle2D.Double(0, 0, width, height,
+				20, 20);
+
+		/* the vector from the centre of the box to the target */
+		double vx = tx - cx;
+		double vy = ty - cy;
+
+		double mag = Math.sqrt(vx * vx + vy * vy);
+
+		final double perplen = 50;
+		final double shorten = 40;
+
+		double px = vy / mag * perplen;
+		double py = -vx / mag * perplen;
+
+		vx *= (mag - shorten) / mag;
+		vy *= (mag - shorten) / mag;
+
+		double ox = width / 2;
+		double oy = height / 2;
+
+		Path2D triangle = new Path2D.Double();
+		triangle.moveTo(ox + vx, oy + vy);
+		triangle.lineTo(ox + px, oy + py);
+		triangle.lineTo(ox - px, oy - py);
+		triangle.closePath();
+
+		Area bubble = new Area(box);
+
+		bubble.add(new Area(triangle));
+
+		g.setTransform(xform);
+		/* draw the inside */
+		g.setColor(Color.WHITE);
+		g.fill(bubble);
+		/* draw the outside */
+		g.setColor(Color.BLACK);
+		Stroke orig = g.getStroke();
+		g.setStroke(new BasicStroke(2f));
+		g.draw(bubble);
+		g.setStroke(orig);
+
+		/* now draw inside the box */
+
+		float qscale = 0.6f;
+		g.setFont(Resources.GAME_FONT.deriveFont(135f * qscale));
+		FontMetrics fm = g.getFontMetrics();
+		g.drawString("NO", width / 2 - fm.stringWidth("NO") / 2, height
+				/ 2 + fm.getAscent() / 2);
 
 		g.setTransform(new AffineTransform());
 	}

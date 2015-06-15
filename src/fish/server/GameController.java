@@ -119,6 +119,8 @@ public class GameController implements Controller {
 			PMGameState pk = new PMGameState(gs.players.get(i).s,
 					gs.declared, others, gs.turn);
 
+			System.out.println(pk);
+
 			gs.players.get(i).i.insertMessage(pk);
 		}
 	}
