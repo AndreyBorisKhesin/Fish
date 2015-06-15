@@ -46,7 +46,7 @@ public class FishGUI extends JPanel {
 
 		bufg.setBackground(new Color(0x00, 0xce, 0xd1));
 
-		setSize(Resolution._1024_576);
+		setSize(Resolution._ANDREYS_SCREEN);
 
 		/* placing of things */
 		cpane.setLayout(null);
