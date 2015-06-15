@@ -9,6 +9,7 @@ import java.util.Map;
 
 import fish.Card;
 import fish.Declaration;
+import fish.Hand;
 import fish.Question;
 import fish.Team;
 import fish.Util;
@@ -78,11 +79,16 @@ public class GameController implements Controller {
 		Collections.shuffle(seats, ServerUtil.rand);
 
 		for (int i = 0; i < inters.size(); i++) {
-			gs.players.add(new PlayerContainer(new PlayerState(i,
-					seats.get(i), inters.get(i).getUname(),
-					seats.get(i) % 2 == 0 ? Team.RED
-							: Team.BLU), inters
-					.get(i)));
+			gs.players.add(new PlayerContainer(
+					new PlayerState(
+							i,
+							seats.get(i),
+							inters.get(i)
+									.getUname(),
+							seats.get(i) % 2 == 0 ? Team.RED
+									: Team.BLU,
+							new Hand()), inters
+							.get(i)));
 		}
 
 		dealDeck();
@@ -116,8 +122,12 @@ public class GameController implements Controller {
 		}
 
 		for (int i = 0; i < gs.players.size(); i++) {
-			PMGameState pk = new PMGameState(gs.players.get(i).s,
-					gs.declared, others, gs.turn);
+			PlayerState old = gs.players.get(i).s;
+			PlayerState ps = new PlayerState(old.id, old.seat,
+					old.name, old.team, new Hand(
+							old.hand.getCards()));
+			PMGameState pk = new PMGameState(ps, gs.declared,
+					others, gs.turn);
 
 			System.out.println(pk);
 
@@ -180,6 +190,13 @@ public class GameController implements Controller {
 			e.printStackTrace();
 		}
 
+		/* print all hands */// FIXME: remove
+		System.out.println("Before:");
+		for (int i = 0; i < gs.players.size(); i++) {
+			System.out.println(i + ","
+					+ gs.players.get(i).i.getUname() + ": "
+					+ gs.players.get(i).s.hand);
+		}
 		/* now we resolve the question and send the result */
 		Question q = sm.q;
 		boolean res = gs.players.get(q.dest).s.hand.contains(q.c);
@@ -193,6 +210,14 @@ public class GameController implements Controller {
 			addEvent(s.getUname(sm.q.dest) + " does not have the "
 					+ q.c.humanRep());
 			gs.turn = q.dest;
+		}
+
+		// FIXME: remove
+		System.out.println("After:");
+		for (int i = 0; i < gs.players.size(); i++) {
+			System.out.println(i + ","
+					+ gs.players.get(i).i.getUname() + ": "
+					+ gs.players.get(i).s.hand);
 		}
 
 		checkEndgameState();
