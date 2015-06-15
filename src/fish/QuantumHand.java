@@ -36,6 +36,8 @@ public class QuantumHand {
 	 */
 	private boolean[] moved = new boolean[8];
 
+	private int genericCardNum;
+
 	/**
 	 * Default QuantumHand constructor.
 	 * Contains each Card with equal probability.
@@ -44,12 +46,13 @@ public class QuantumHand {
 		for (int i = 0; i < 8; i++) {
 			quantumHand[i] = new HashMap<>();
 			bounds[i][0] = 0;
-			bounds[i][1] = 6;
+			bounds[i][1] = Math.min(6, 48 / numPlayers);
 		}
 		quantumHand[8] = new HashMap<>();
 		for (int i = 0; i < 48; i++) {
 			quantumHand[8].put(new Card(i), 1d / numPlayers);
 		}
+		genericCardNum = 48 / numPlayers;
 	}
 
 	public QuantumHand(Hand hand) {
@@ -63,6 +66,7 @@ public class QuantumHand {
 		for (int i = 0; i < 48; i++) {
 			quantumHand[8].put(new Card(i), 0d);
 		}
+		genericCardNum = 0;
 	}
 
 	public List<Card> check() {
@@ -80,6 +84,9 @@ public class QuantumHand {
 		if (!isZero(this.get(c))) {
 			bounds[suit(c)][0]--;
 			bounds[suit(c)][1]--;
+			if (c.suit == 8) {
+				genericCardNum--;
+			}
 		}
 		hand.add(c);
 		zero(c);
@@ -131,6 +138,7 @@ public class QuantumHand {
 					}
 				}
 				moved[suit] = true;
+				genericCardNum -= bounds[suit][0];
 			}
 		}
 	}
@@ -167,5 +175,9 @@ public class QuantumHand {
 
 	public boolean[] getMoved() {
 		return moved;
+	}
+
+	public int getGenericCardNum() {
+		return genericCardNum;
 	}
 }

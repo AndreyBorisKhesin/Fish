@@ -24,11 +24,11 @@ public class AI extends Player {
 	private void instantiate(int numPlayers) {
 		hands = new QuantumHand[numPlayers];
 		for (int i = 0; i < numPlayers; i++) {
-			if (i == this.id)
-				continue;
+			if (i == this.id) {
+				hands[id] = new QuantumHand(hand);
+			}
 			hands[i] = new QuantumHand(numPlayers);
 		}
-		hands[id] = new QuantumHand(this.hand);
 
 		// FIXME: rebalance();
 
@@ -91,7 +91,9 @@ public class AI extends Player {
 				for (int k = 0; k < 48; k++) {
 					array[9 * i + j][k] = hands[i].get(k);
 				}
-				if (j == 8 || hands[i].getMoved()[j]) {
+				if (j == 8) {
+					units[9 * i + j] = hands[i].getGenericCardNum();
+				} else if (hands[i].getMoved()[j]) {
 					units[9 * i + j] = hands[i].getBounds()[j][0];
 				} else {
 					units[9 * i + j] = 0;
