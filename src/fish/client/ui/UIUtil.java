@@ -48,13 +48,12 @@ public class UIUtil {
 		try {
 			temp = ImageIO.read(UIUtil.class.getClassLoader()
 					.getResourceAsStream(ref));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			try {
 				temp = ImageIO.read(new File(ref));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-
 		}
 		return temp;
 	}

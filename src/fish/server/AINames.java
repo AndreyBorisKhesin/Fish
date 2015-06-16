@@ -1,8 +1,6 @@
 package fish.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +11,17 @@ public class AINames {
 	static {
 		NAMES = new ArrayList<String>();
 
+		InputStream in = AINames.class.getClassLoader()
+				.getResourceAsStream(NAMES_LOC);
+		if (in == null) {
+			try {
+				in = new FileInputStream(NAMES_LOC);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 		BufferedReader br = new BufferedReader(
-				new InputStreamReader(AINames.class
-						.getClassLoader()
-						.getResourceAsStream(NAMES_LOC)));
+				new InputStreamReader(in));
 
 		String s;
 		try {
