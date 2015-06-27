@@ -139,8 +139,8 @@ public class GameGUI extends GUIScreen {
 
 		if (correct) {
 			/* find the layout of the aske[re] */
-			Layout askeeL = getPlayerLayout(question.source);
-			Layout askerL = getPlayerLayout(question.dest);
+			Layout askerL = getPlayerLayout(question.source);
+			Layout askeeL = getPlayerLayout(question.dest);
 
 			AffineTransform startxform = null;
 			AffineTransform endxform = null;
@@ -159,15 +159,15 @@ public class GameGUI extends GUIScreen {
 				startI = this.middleI;
 				startxform = getPlayerCardXform(question.c);
 			} else {
-				startxform = getOpponentXform(askerL);
+				startxform = getOpponentXform(askeeL);
 				startxform.scale(-1, 1);
 				startxform.translate(-71, 0);
 
 				OtherPlayerData d = p.others.get(question.dest);
-				Layout l = getPlayerLayout(d.id);
 				startI = flip.filter(
 						drawCardBack(d.t, d.numCards,
-								l.rot), null);
+								askeeL.rot),
+						null);
 
 				/*
 				 * render the underlying player card as
@@ -179,8 +179,8 @@ public class GameGUI extends GUIScreen {
 			if (question.source == p.id) {
 				/*
 				 * we should insert it into the hand now to make
-				 * space for it, the hand will be drawn as
-				 * invisible for it
+				 * space for it, the hand will draw it as
+				 * invisible
 				 */
 				p.hand.add(question.c);
 
@@ -188,16 +188,17 @@ public class GameGUI extends GUIScreen {
 
 				endI = this.middleI;
 			} else {
-				endxform = getOpponentXform(askeeL);
-				/* the starting images are 10x size */
+				endxform = getOpponentXform(askerL);
 				endxform.scale(-1, 1);
-				startxform.translate(-71, 0);
+				endxform.translate(-71, 0);
 
-				OtherPlayerData d = p.others.get(question.dest);
-				Layout l = getPlayerLayout(d.id);
-				startI = flip.filter(
-						drawCardBack(d.t, d.numCards,
-								l.rot), null);
+				OtherPlayerData d = p.others
+						.get(question.source);
+				endI = flip.filter(
+						drawCardBack(d.t,
+								d.numCards + 1,
+								askerL.rot),
+						null);
 			}
 
 			AffineTransform middlexform = new AffineTransform();
@@ -266,7 +267,7 @@ public class GameGUI extends GUIScreen {
 
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
-		// long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		this.w = w;
 		this.h = h;
 		this.gw = w - 250;
@@ -295,7 +296,7 @@ public class GameGUI extends GUIScreen {
 
 		g.clearRect(gw, 0, w - gw, h);
 
-		// System.out.println(System.currentTimeMillis() - start);
+		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	/**
@@ -353,7 +354,8 @@ public class GameGUI extends GUIScreen {
 				 * transferring version instead
 				 */
 				if (mode == DrawMode.QUESTION_RESPONSE
-						&& qcorrect && c == question.c) {
+						&& qcorrect
+						&& c.equals(question.c)) {
 					drawQuestionResponseRight(g);
 				} else {
 					g.drawImage(Resources.CARD_IMGS.get(c),
