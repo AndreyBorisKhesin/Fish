@@ -249,11 +249,27 @@ public class GameGUI extends GUIScreen {
 
 			t += step;
 		}
-		
-		if(correct) {
+
+		if (correct) {
 			/* we need to update the card num for the recipient */
 			OtherPlayerData d = p.others.get(question.source);
 			d.numCards++;
+
+			/* wait here for a little bit to avoid jitter */
+
+			t = 3;
+			long start = System.currentTimeMillis();
+			gui.repaint();
+
+			long sleepTime = (long) ((time / (3 / step)) * 1000)
+					- (System.currentTimeMillis() - start);
+			if (sleepTime >= 0) {
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		switchMode(DrawMode.WAIT_FOR_Q);
