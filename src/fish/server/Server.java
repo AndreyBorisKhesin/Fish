@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import fish.players.AI;
 import fish.players.Player;
-import fish.players.RandAI;
 import fish.server.messages.PlayerMessage;
 import fish.server.messages.SMConnection;
 import fish.server.messages.ServerMessage;
@@ -118,11 +117,11 @@ public class Server implements Runnable {
 	}
 
 	public void addAI() {
-		Player ai = new RandAI(ainames.getName());
+		Player ai = new AI(ainames.getName());
 		this.insertMessage(new SMConnection(
 				new LocalInterface(this, ai)));
 	}
-
+	
 	/**
 	 * Send a message to all connected players
 	 * 
