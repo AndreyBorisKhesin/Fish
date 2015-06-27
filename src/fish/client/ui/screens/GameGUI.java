@@ -249,6 +249,12 @@ public class GameGUI extends GUIScreen {
 
 			t += step;
 		}
+		
+		if(correct) {
+			/* we need to update the card num for the recipient */
+			OtherPlayerData d = p.others.get(question.source);
+			d.numCards++;
+		}
 
 		switchMode(DrawMode.WAIT_FOR_Q);
 	}

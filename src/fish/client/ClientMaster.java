@@ -8,7 +8,7 @@ import fish.client.ui.screens.GameGUI;
 import fish.client.ui.screens.Loader;
 import fish.client.ui.screens.LocalGameSetup;
 import fish.client.ui.screens.MainMenu;
-import fish.players.AI;
+import fish.players.DummyHuman;
 import fish.players.Human;
 import fish.players.Player;
 import fish.server.Server;
@@ -72,12 +72,12 @@ public class ClientMaster {
 	}
 
 	public void startLocalGame(String uname, int numPlayers) {
-		player = new Human(game, uname);
+		player = new DummyHuman(game, uname);
 		game.setPlayer(player);
 
 		/* start server */
 		server = new Server();
-		
+
 		/* connect the player */
 		server.insertMessage(new SMConnection(new LocalInterface(
 				server, player)));
@@ -87,14 +87,14 @@ public class ClientMaster {
 		for (int i = 1; i < numPlayers; i++) {
 			server.addAI();
 		}
-		
+
 		try {
 			Thread.sleep(100);
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
 		}
 
 		server.insertMessage(new MStartGame(0));
-		
+
 		/* switch to the game's point of view */
 		g.switchMode(game);
 	}
