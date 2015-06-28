@@ -64,6 +64,6 @@ public enum Team {
 
 	public String teamStr(String str) {
 		char c = delim();
-		return c + str + c;
+		return c + str;
 	}
 }

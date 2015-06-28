@@ -2,6 +2,7 @@ package fish.client.ui.screens;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -27,6 +28,7 @@ import fish.Card;
 import fish.Question;
 import fish.Team;
 import fish.client.ui.FishGUI;
+import fish.client.ui.GameLog;
 import fish.client.ui.Resources;
 import fish.players.Human;
 import fish.server.OtherPlayerData;
@@ -44,11 +46,17 @@ public class GameGUI extends GUIScreen {
 	}
 
 	private int w, h;
+
 	/* the width of the game screen */
 	private int gw;
+	/* the width of the sidebar */
+	private int sw;
 
 	/* location of the mouse */
 	private int mx = Integer.MAX_VALUE, my = Integer.MAX_VALUE;
+
+	/* the log showing game actions */
+	private GameLog glog;
 
 	/* state variables for WAIT_FOR_Q */
 	private int selection;
@@ -95,10 +103,20 @@ public class GameGUI extends GUIScreen {
 	public GameGUI(FishGUI gui) {
 		super(gui);
 		this.gui = gui;
+		setSize(gui.bufferDimensions());
 
 		mode = DrawMode.WAIT_FOR_Q;
 
 		selection = -1;
+
+		this.glog = new GameLog(sw - 5, this.h / 2);
+	}
+
+	private void setSize(Dimension d) {
+		this.w = d.width;
+		this.h = d.height;
+		this.sw = 245;
+		this.gw = w - sw - 5;
 	}
 
 	/**
@@ -114,6 +132,21 @@ public class GameGUI extends GUIScreen {
 
 	public void question(Question q) {
 		this.question = q;
+
+		{
+			/* construct a string representing this message */
+
+			OtherPlayerData asker = p.others.get(q.source);
+			OtherPlayerData askee = p.others.get(q.dest);
+
+			String msg = asker.t.delim() + asker.uname + " asked "
+					+ askee.t.delim() + askee.uname
+					+ " for the " + q.c.humanRep();
+
+			/* add this to the log */
+			glog.addString(msg);
+		}
+
 		this.switchMode(DrawMode.QUESTION_ASKED);
 
 		/*
@@ -130,6 +163,35 @@ public class GameGUI extends GUIScreen {
 	public void response(boolean correct) {
 		this.mode = DrawMode.QUESTION_RESPONSE;
 		this.qcorrect = correct;
+
+		{
+			/* add appropriate string to the log */
+			if (qcorrect) {
+				OtherPlayerData asker = p.others
+						.get(question.source);
+				OtherPlayerData askee = p.others
+						.get(question.dest);
+
+				String msg = askee.t.delim() + askee.uname
+						+ " gave " + asker.t.delim()
+						+ asker.uname + " the "
+						+ question.c.humanRep();
+				
+				glog.addString(msg);
+			} else {
+				OtherPlayerData askee = p.others
+						.get(question.dest);
+
+				String msg = askee.t.delim() + askee.uname
+						+ " does not have the "
+						+ question.c.humanRep();
+				glog.addString(msg);
+				
+				msg = askee.t.delim() + askee.uname + "'s turn";
+				glog.addString(msg);
+			}
+		}
+
 		renderResponse(correct);
 	}
 
@@ -290,9 +352,6 @@ public class GameGUI extends GUIScreen {
 	@Override
 	public void paintFrame(Graphics2D g, int w, int h) {
 		long start = System.currentTimeMillis();
-		this.w = w;
-		this.h = h;
-		this.gw = w - 250;
 
 		/* if the player is null or the hand is null we aren't ready yet */
 		if (p == null || p.hand == null) {
@@ -318,7 +377,41 @@ public class GameGUI extends GUIScreen {
 
 		g.clearRect(gw, 0, w - gw, h);
 
+		/* draw the sidebar */
+		drawSidebar(g);
+
 		System.out.println(System.currentTimeMillis() - start);
+	}
+
+	private void drawSidebar(Graphics2D g) {
+		g.setTransform(AffineTransform.getTranslateInstance(this.w
+				- this.sw, 0));
+
+		drawSidebarBorder(g);
+		drawLog(g);
+
+		g.setTransform(new AffineTransform());
+	}
+
+	private void drawSidebarBorder(Graphics2D g) {
+		g.setColor(Color.BLACK);
+
+		Stroke s = g.getStroke();
+		g.setStroke(new BasicStroke(5.0f));
+
+		g.drawLine(-3, 0, -3, h);
+
+		g.setStroke(s);
+	}
+
+	private void drawLog(Graphics2D g) {
+		g.drawImage(glog.getImg(), 5, h - glog.h, null);
+		Stroke s = g.getStroke();
+		g.setStroke(new BasicStroke(3.0f));
+
+		g.drawLine(0, h - glog.h, sw, h - glog.h);
+
+		g.setStroke(s);
 	}
 
 	/**

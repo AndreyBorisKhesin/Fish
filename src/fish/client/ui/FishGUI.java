@@ -2,6 +2,7 @@ package fish.client.ui;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -102,5 +103,9 @@ public class FishGUI extends JPanel {
 
 	public void redraw() {
 		frame.repaint();
+	}
+
+	public Dimension bufferDimensions() {
+		return new Dimension(buf.getWidth(), buf.getHeight());
 	}
 }
