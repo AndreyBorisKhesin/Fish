@@ -200,94 +200,7 @@ public class GameGUI extends GUIScreen {
 		double time = 3.;
 
 		if (correct) {
-			/* find the layout of the aske[re] */
-			Layout askerL = getPlayerLayout(question.source);
-			Layout askeeL = getPlayerLayout(question.dest);
-
-			AffineTransform startxform = null;
-			AffineTransform endxform = null;
-
-			AffineTransform flipxform = AffineTransform
-					.getScaleInstance(-1, 1);
-			flipxform.translate(-710, 0);
-			AffineTransformOp flip = new AffineTransformOp(
-					flipxform, null);
-
-			this.middleI = Resources
-					.scaleImage(Resources.CARD_IMGS
-							.get(question.c), 10);
-
-			if (question.dest == p.id) {
-				startI = this.middleI;
-				startxform = getPlayerCardXform(question.c);
-			} else {
-				startxform = getOpponentXform(askeeL);
-				startxform.scale(-1, 1);
-				startxform.translate(-71, 0);
-
-				OtherPlayerData d = p.others.get(question.dest);
-				startI = flip.filter(
-						drawCardBack(d.t, d.numCards,
-								askeeL.rot),
-						null);
-
-				/*
-				 * render the underlying player card as
-				 * having one less card
-				 */
-				d.numCards--;
-
-			}
-			if (question.source == p.id) {
-				/*
-				 * we should insert it into the hand now to make
-				 * space for it, the hand will draw it as
-				 * invisible
-				 */
-				p.hand.add(question.c);
-
-				endxform = getPlayerCardXform(question.c);
-
-				endI = this.middleI;
-			} else {
-				endxform = getOpponentXform(askerL);
-				endxform.scale(-1, 1);
-				endxform.translate(-71, 0);
-
-				OtherPlayerData d = p.others
-						.get(question.source);
-				endI = flip.filter(
-						drawCardBack(d.t,
-								d.numCards + 1,
-								askerL.rot),
-						null);
-			}
-
-			AffineTransform middlexform = new AffineTransform();
-			middlexform.translate(gw / 2, h / 2);
-			double scale = 2.5;
-			middlexform.scale(scale, scale);
-			middlexform.translate(-71. / 2, -96. / 2);
-
-			/* the images are 10x size */
-			startxform.scale(0.1, 0.1);
-			endxform.scale(0.1, 0.1);
-			middlexform.scale(0.1, 0.1);
-
-			this.startX = new double[6];
-			this.middleX = new double[6];
-			this.endX = new double[6];
-			this.diff1 = new double[6];
-			this.diff2 = new double[6];
-
-			startxform.getMatrix(startX);
-			middlexform.getMatrix(middleX);
-			endxform.getMatrix(endX);
-
-			for (int i = 0; i < 6; i++) {
-				diff1[i] = middleX[i] - startX[i];
-				diff2[i] = endX[i] - middleX[i];
-			}
+			setupCardTransfer();
 		}
 
 		gui.repaint();
@@ -335,6 +248,91 @@ public class GameGUI extends GUIScreen {
 		}
 
 		switchMode(DrawMode.WAIT_FOR_Q);
+	}
+
+	private void setupCardTransfer() {
+		/* find the layout of the aske[re] */
+		Layout askerL = getPlayerLayout(question.source);
+		Layout askeeL = getPlayerLayout(question.dest);
+
+		AffineTransform startxform = null;
+		AffineTransform endxform = null;
+
+		AffineTransform flipxform = AffineTransform.getScaleInstance(
+				-1, 1);
+		flipxform.translate(-710, 0);
+		AffineTransformOp flip = new AffineTransformOp(flipxform, null);
+
+		this.middleI = Resources.scaleImage(
+				Resources.CARD_IMGS.get(question.c), 10);
+
+		if (question.dest == p.id) {
+			startI = this.middleI;
+			startxform = getPlayerCardXform(question.c);
+		} else {
+			startxform = getOpponentXform(askeeL);
+			startxform.scale(-1, 1);
+			startxform.translate(-71, 0);
+
+			OtherPlayerData d = p.others.get(question.dest);
+			startI = flip.filter(
+					drawCardBack(d.t, d.numCards,
+							askeeL.rot), null);
+
+			/*
+			 * render the underlying player card as
+			 * having one less card
+			 */
+			d.numCards--;
+
+		}
+		if (question.source == p.id) {
+			/*
+			 * we should insert it into the hand now to make
+			 * space for it, the hand will draw it as
+			 * invisible
+			 */
+			p.hand.add(question.c);
+
+			endxform = getPlayerCardXform(question.c);
+
+			endI = this.middleI;
+		} else {
+			endxform = getOpponentXform(askerL);
+			endxform.scale(-1, 1);
+			endxform.translate(-71, 0);
+
+			OtherPlayerData d = p.others.get(question.source);
+			endI = flip.filter(
+					drawCardBack(d.t, d.numCards + 1,
+							askerL.rot), null);
+		}
+
+		AffineTransform middlexform = new AffineTransform();
+		middlexform.translate(gw / 2, h / 2);
+		double scale = 2.5;
+		middlexform.scale(scale, scale);
+		middlexform.translate(-71. / 2, -96. / 2);
+
+		/* the images are 10x size */
+		startxform.scale(0.1, 0.1);
+		endxform.scale(0.1, 0.1);
+		middlexform.scale(0.1, 0.1);
+
+		this.startX = new double[6];
+		this.middleX = new double[6];
+		this.endX = new double[6];
+		this.diff1 = new double[6];
+		this.diff2 = new double[6];
+
+		startxform.getMatrix(startX);
+		middlexform.getMatrix(middleX);
+		endxform.getMatrix(endX);
+
+		for (int i = 0; i < 6; i++) {
+			diff1[i] = middleX[i] - startX[i];
+			diff2[i] = endX[i] - middleX[i];
+		}
 	}
 
 	private void switchMode(DrawMode mode) {
