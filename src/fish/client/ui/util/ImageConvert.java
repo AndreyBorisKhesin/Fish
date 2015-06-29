@@ -10,6 +10,31 @@ import javax.imageio.ImageIO;
 
 public class ImageConvert {
 	public static void main(String[] args) {
+		// cards();
+		backs();
+	}
+
+	public static void backs() {
+		BufferedImage bi = null;
+		try {
+			bi = ImageIO.read(new File(
+					"resources/cards/olds/bb.png"));
+			ImageIO.write(transformBack(bi), "png", new File(
+					"resources/cards/bb.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			bi = ImageIO.read(new File(
+					"resources/cards/olds/br.png"));
+			ImageIO.write(transformBack(bi), "png", new File(
+					"resources/cards/br.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void cards() {
 		for (int i = 1; i <= 52; i++) {
 			if (i > 24 && i < 29) {
 				continue;
@@ -84,5 +109,17 @@ public class ImageConvert {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static BufferedImage transformBack(BufferedImage bi) {
+		BufferedImage n = new BufferedImage(bi.getWidth(),
+				bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		for (int i = 0; i < bi.getWidth(); i++) {
+			for (int j = 0; j < bi.getHeight(); j++) {
+				n.setRGB(i, j, bi.getRGB(i, j));
+			}
+		}
+
+		return n;
 	}
 }

@@ -176,7 +176,7 @@ public class GameGUI extends GUIScreen {
 						+ " gave " + asker.t.delim()
 						+ asker.uname + " the "
 						+ question.c.humanRep();
-				
+
 				glog.addString(msg);
 			} else {
 				OtherPlayerData askee = p.others
@@ -186,7 +186,7 @@ public class GameGUI extends GUIScreen {
 						+ " does not have the "
 						+ question.c.humanRep();
 				glog.addString(msg);
-				
+
 				msg = askee.t.delim() + askee.uname + "'s turn";
 				glog.addString(msg);
 			}
@@ -997,8 +997,10 @@ public class GameGUI extends GUIScreen {
 	private BufferedImage drawCardBack(Team t, int numCards, int rot) {
 		Graphics2D g = cardBackG;
 
-		g.drawImage(Resources.CARD_BACKS.get(t),
-				AffineTransform.getScaleInstance(10, 10), null);
+		/* if we have no cards, draw a grayed image */
+		BufferedImage img = (numCards > 0 ? Resources.CARD_BACKS
+				: Resources.CARD_BACKS_GRAY).get(t);
+		g.drawImage(img, AffineTransform.getScaleInstance(10, 10), null);
 
 		Font f = Resources.GAME_FONT.deriveFont(40f);
 		/* translate by the font size */
@@ -1205,10 +1207,9 @@ public class GameGUI extends GUIScreen {
 
 	private void clickWaitForQuestion() {
 		if (p.turn == p.id && selection != -1) {
-			for (OtherPlayerData d : p.others) {
-				if (d.id == selection && d.t == p.team) {
-					return;
-				}
+			OtherPlayerData d = p.others.get(selection);
+			if (d.t == p.team || d.numCards == 0) {
+				return;
 			}
 
 			rankselection = -1;
