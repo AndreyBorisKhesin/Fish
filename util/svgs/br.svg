@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="223.228"
+   height="311.811"
+   id="svg3808"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="br.svg">
+  <defs
+     id="defs3810">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#pattern6848-573-300"
+       id="pattern9356-210"
+       patternTransform="matrix(6.702973,-6.702973,6.702973,6.702973,290.53566,-975.8662)" />
+    <pattern
+       patternTransform="matrix(6.702973,-6.702973,6.702973,6.702973,53.903189,229.2031)"
+       id="pattern6848-573-300"
+       xlink:href="#Checkerboard-577-187"
+       inkscape:collect="always" />
+    <pattern
+       inkscape:collect="always"
+       patternUnits="userSpaceOnUse"
+       width="2"
+       height="2"
+       patternTransform="translate(0,0) scale(10,10)"
+       id="Checkerboard-577-187"
+       inkscape:stockid="Checkerboard">
+      <rect
+         style="fill:#d40000;stroke:none"
+         x="0"
+         y="0"
+         width="1"
+         height="1"
+         id="rect10452" />
+      <rect
+         style="fill:#d40000;stroke:none"
+         x="1"
+         y="1"
+         width="1"
+         height="1"
+         id="rect10454" />
+    </pattern>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="139.35798"
+     inkscape:cy="205.71429"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="815"
+     inkscape:window-height="462"
+     inkscape:window-x="1641"
+     inkscape:window-y="74"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata3813">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       transform="translate(-229.71725,-321.56781)"
+       id="g9342">
+      <g
+         transform="translate(-614.2857,338.57142)"
+         id="g9344">
+        <g
+           style="display:inline"
+           id="g9346"
+           transform="translate(1228.8763,-485.99486)">
+          <g
+             transform="translate(-125.25891,-32.324881)"
+             id="g9348">
+            <rect
+               style="fill:#ffffff;stroke:#000000;stroke-width:1;stroke-opacity:1"
+               id="rect9350"
+               width="222.22835"
+               height="310.81104"
+               x="-259.11444"
+               y="501.8161"
+               ry="10.629921"
+               rx="10.629921" />
+            <rect
+               style="fill:none;stroke:#d40000;stroke-width:4.95238304;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               id="rect9352"
+               width="197.05205"
+               height="286.64417"
+               x="-246.52632"
+               y="513.89954"
+               ry="0" />
+            <rect
+               style="fill:url(#pattern9356-210);fill-opacity:1;stroke:#d40000;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               id="rect9354"
+               width="188.27672"
+               height="278.90585"
+               x="-242.13863"
+               y="517.76868" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
