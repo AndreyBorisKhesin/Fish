@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.function.IntToDoubleFunction;
 
 import fish.Card;
+import fish.Declaration;
 import fish.Question;
 import fish.Team;
 import fish.client.ui.FishGUI;
 import fish.client.ui.GameLog;
 import fish.client.ui.Resources;
+import fish.client.ui.elements.Button;
 import fish.players.Human;
 import fish.server.OtherPlayerData;
 import fish.server.ServerUtil;
@@ -54,17 +56,28 @@ public class GameGUI extends GUIScreen {
 	/* the width of the sidebar */
 	private int sw;
 
+	/* sidebar buttons */
+	private List<Button> buttons;
+
 	/* location of the mouse */
 	private int mx = Integer.MAX_VALUE, my = Integer.MAX_VALUE;
 
 	/* the log showing game actions */
 	private GameLog glog;
 
+	/* if this is true we should render the prompt to choose a suit */
+	private boolean declarePressed;
+
 	/* state variables for WAIT_FOR_Q */
 	private int selection;
 
-	/* state variables for ASK_QUESTION */
+	/* state variables for ASK_QUESTION/DECLARATION */
 	private double cardscale = 1.5;
+
+	private boolean[] grayedsuits;
+
+	private int suitselection;
+	private int rankselection;
 
 	/* state variables for QUESTION_ASKED */
 	private Question question;
@@ -97,11 +110,6 @@ public class GameGUI extends GUIScreen {
 
 	private AskMode askmode;
 
-	private boolean[] grayedsuits;
-
-	private int suitselection;
-	private int rankselection;
-
 	public GameGUI(FishGUI gui) {
 		super(gui);
 		this.gui = gui;
@@ -112,6 +120,8 @@ public class GameGUI extends GUIScreen {
 		selection = -1;
 
 		this.glog = new GameLog(sw - 5, this.h / 2);
+
+		initButtons();
 	}
 
 	private void setSize(Dimension d) {
@@ -119,6 +129,31 @@ public class GameGUI extends GUIScreen {
 		this.h = d.height;
 		this.sw = 245;
 		this.gw = w - sw - 5;
+	}
+
+	private void initButtons() {
+		this.buttons = new ArrayList<Button>();
+
+		Button startDec = new Button(w - sw + 5, 120, sw - 10, 70,
+				"Declare", Resources.font(30),
+				this::declareButton);
+
+		this.buttons.add(startDec);
+	}
+
+	private void declareButton() {
+		System.out.println("DECLARING");
+
+		/*
+		 * when choosing a suit to declare, the game should continue as
+		 * no one else will be stopped yet, so this is not a distinct
+		 * mode
+		 */
+		declarePressed = true;
+		suitselection = -1;
+		this.grayedsuits = new boolean[8];
+
+		updated();
 	}
 
 	/**
@@ -375,6 +410,11 @@ public class GameGUI extends GUIScreen {
 			break;
 		}
 
+		/* we might be choosing a suit to declare */
+		if (declarePressed) {
+			drawAskSuit(g);
+		}
+
 		g.clearRect(gw, 0, w - gw, h);
 
 		/* draw the sidebar */
@@ -392,6 +432,11 @@ public class GameGUI extends GUIScreen {
 		drawTricks(g);
 
 		g.setTransform(new AffineTransform());
+
+		/* draw buttons */
+		for (Button b : buttons) {
+			b.draw(g);
+		}
 	}
 
 	private void drawSidebarBorder(Graphics2D g) {
@@ -1093,6 +1138,11 @@ public class GameGUI extends GUIScreen {
 	}
 
 	private void mouseMoved() {
+		if (declarePressed) {
+			movedAskSuit();
+			return;
+		}
+
 		switch (mode) {
 		case WAIT_FOR_Q:
 			movedWaitForQuestion();
@@ -1100,6 +1150,11 @@ public class GameGUI extends GUIScreen {
 		case ASK_QUESTION:
 			movedAskQuestion();
 			break;
+		}
+
+		/* tell buttons */
+		for (Button b : buttons) {
+			b.mouseMoved(mx, my, gui);
 		}
 	}
 
@@ -1237,7 +1292,15 @@ public class GameGUI extends GUIScreen {
 
 	@Override
 	public void mousePressed(int x, int y, int button) {
+		this.mx = x;
+		this.my = y;
 		if (button != MouseEvent.BUTTON1) {
+			return;
+		}
+
+		/* if we're attempting to declare we should handle that */
+		if (declarePressed) {
+			clickDeclareSuit();
 			return;
 		}
 
@@ -1249,6 +1312,22 @@ public class GameGUI extends GUIScreen {
 			clickAskQuestion();
 			break;
 		}
+
+		/* tell buttons */
+		for (Button b : buttons) {
+			b.mouseLeftClick(mx, my, gui);
+		}
+	}
+
+	private void clickDeclareSuit() {
+		declarePressed = false;
+		this.updated();
+		if (suitselection == -1) {
+			return;
+		}
+
+		/* enter full scale declaration mode */
+		p.pi.sendDecStart(new Declaration(p.id, suitselection));
 	}
 
 	private void clickWaitForQuestion() {
