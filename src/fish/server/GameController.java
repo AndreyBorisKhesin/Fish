@@ -129,8 +129,6 @@ public class GameController implements Controller {
 			PMGameState pk = new PMGameState(ps, gs.declared,
 					others, gs.turn);
 
-			// System.out.println(pk);
-
 			gs.players.get(i).i.insertMessage(pk);
 		}
 	}
@@ -211,6 +209,13 @@ public class GameController implements Controller {
 
 		s.broadcast(new PMResponse(q, res));
 		sendGameState();
+
+		/* now we wait for the guis to render the response */
+		try {
+			Thread.sleep(RESPONSE_WAIT);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void decStarted(MDecStart sm) {
@@ -233,7 +238,9 @@ public class GameController implements Controller {
 		gs.dec = sm.d;
 		gs.dec.locs = new int[6];
 		for (int i = 0; i < 6; i++) {
-			gs.dec.locs[i] = -1;
+			gs.dec.locs[i] = gs.players.get(gs.dec.source).s.hand
+					.contains(new Card(gs.dec.suit, i)) ? gs.dec.source
+					: -1;
 		}
 
 		s.broadcast(sm);

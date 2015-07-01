@@ -3,6 +3,7 @@ package fish.players;
 import java.util.List;
 import java.util.Map;
 
+import fish.Card;
 import fish.Declaration;
 import fish.Question;
 import fish.Team;
@@ -20,6 +21,10 @@ public class Human extends Player {
 	public Human(GameGUI gui, String name) {
 		this.gui = gui;
 		this.name = name;
+	}
+
+	public void declare(int suit) {
+		pi.sendDecStart(new Declaration(id, suit));
 	}
 
 	@Override
@@ -44,11 +49,7 @@ public class Human extends Player {
 	@Override
 	public void decStarted(Declaration d) {
 		this.dec = d;
-		if (d.source == this.id) {
-			/* this is a different case */
-		} else {
-			/* show the declaration */
-		}
+		gui.declaration(d);
 	}
 
 	@Override

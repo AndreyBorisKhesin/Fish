@@ -46,6 +46,6 @@ public final class Util {
 	public static String suitHumanRep(int suit) {
 		final String suits[] = { "Clubs", "Diamonds", "Hearts",
 				"Spades" };
-		return suit % 2 == 0 ? "Low " : "High " + suits[suit / 2];
+		return (suit % 2 == 0 ? "Low " : "High ") + suits[suit / 2];
 	}
 }

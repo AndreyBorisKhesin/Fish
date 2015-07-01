@@ -29,6 +29,7 @@ import fish.Card;
 import fish.Declaration;
 import fish.Question;
 import fish.Team;
+import fish.Util;
 import fish.client.ui.FishGUI;
 import fish.client.ui.GameLog;
 import fish.client.ui.Resources;
@@ -72,6 +73,12 @@ public class GameGUI extends GUIScreen {
 	private int selection;
 
 	/* state variables for ASK_QUESTION/DECLARATION */
+	private static enum AskMode {
+		SUIT, RANK
+	}
+
+	private AskMode askmode;
+
 	private double cardscale = 1.5;
 
 	private boolean[] grayedsuits;
@@ -104,11 +111,11 @@ public class GameGUI extends GUIScreen {
 	/* the images we are drawing */
 	private BufferedImage startI, middleI, endI;
 
-	private static enum AskMode {
-		SUIT, RANK
-	}
+	/* state variables for DECLARATION */
+	private Declaration d;
 
-	private AskMode askmode;
+	private Card selectedcard;
+	private int sourcex, sourcey;
 
 	public GameGUI(FishGUI gui) {
 		super(gui);
@@ -134,11 +141,14 @@ public class GameGUI extends GUIScreen {
 	private void initButtons() {
 		this.buttons = new ArrayList<Button>();
 
-		Button startDec = new Button(w - sw + 5, 120, sw - 10, 70,
-				"Declare", Resources.font(30),
-				this::declareButton);
+		{
+			Button but = new Button(w - sw + 5, 120, sw - 10, 70,
+					"Declare", Resources.font(30),
+					this::declareButton,
+					() -> this.mode != DrawMode.DECLARATION);
 
-		this.buttons.add(startDec);
+			buttons.add(but);
+		}
 	}
 
 	private void declareButton() {
@@ -230,6 +240,21 @@ public class GameGUI extends GUIScreen {
 		}
 
 		renderResponse(correct);
+	}
+
+	public void declaration(Declaration d) {
+		this.d = d;
+
+		{
+			OtherPlayerData decer = p.others.get(d.source);
+			String msg = decer.t.delim() + decer.uname
+					+ " started to declare "
+					+ Util.suitHumanRep(d.suit);
+
+			glog.addString(msg);
+		}
+
+		this.switchMode(DrawMode.DECLARATION);
 	}
 
 	private void renderResponse(boolean correct) {
@@ -407,6 +432,9 @@ public class GameGUI extends GUIScreen {
 			break;
 		case QUESTION_RESPONSE:
 			drawQuestionResponse(g);
+			break;
+		case DECLARATION:
+			drawDeclaration(g);
 			break;
 		}
 
@@ -1073,6 +1101,69 @@ public class GameGUI extends GUIScreen {
 		g.setTransform(new AffineTransform());
 	}
 
+	private void drawDeclaration(Graphics2D g) {
+		if (this.d.source == p.id) {
+			drawDeclarationMe(g);
+		} else {
+			drawDeclarationOther(g);
+		}
+	}
+
+	private void drawDeclarationMe(Graphics2D g) {
+		
+
+		String s = "Who is holding these cards?";
+
+		g.setColor(Color.BLACK);
+		g.setFont(Resources.font(30));
+		FontMetrics fm = g.getFontMetrics();
+		g.drawString(s,
+				(int) (0.5 * gw - fm.stringWidth(s) / 2),
+				(int) (0.5 * h - 111 * cardscale - fm.getDescent() - 10));
+		/* draw the cards in the middle */
+		for (int i = 0; i < d.locs.length; i++) {
+			if (d.locs[i] >= 0)
+				continue;
+
+			/* draw this separately */
+			if (selectedcard != null && i == selectedcard.rank)
+				continue;
+
+			AffineTransform xform = new AffineTransform();
+			xform.translate(0.5 * gw, 0.5 * h - 10);
+			xform.scale(cardscale, cardscale);
+			xform.translate(((i / 2) - 2) * 81,
+					((i % 2) - 1) * 106 + 5);
+			xform.translate(71 / 2., 0);
+
+			g.setTransform(xform);
+			/* if its selected outline it */
+			if (rankselection == i) {
+				g.setColor(Resources.GLOW);
+				g.fillRoundRect(-10, -10, 91, 116, 10, 10);
+			}
+
+			BufferedImage img = Resources.CARD_IMGS.get(new Card(
+					d.suit, i));
+			g.drawImage(img, 0, 0, null);
+			g.setTransform(new AffineTransform());
+		}
+	}
+
+	private void drawDeclarationOther(Graphics2D g) {
+		drawDeclaredCards(g);
+	}
+
+	private void drawDeclaredCards(Graphics2D g) {
+		List<List<Card>> cardLocs = new ArrayList<List<Card>>();
+		for (int i = 0; i < p.others.size(); i++) {
+			cardLocs.add(new ArrayList<Card>());
+		}
+		for (int i = 0; i < d.locs.length; i++) {
+			cardLocs.get(d.locs[i]).add(new Card(d.suit, i));
+		}
+	}
+
 	/**
 	 * Buffer used for the function below, we scale it up by 10 so we can
 	 * later downsize it to the right size without the text looking blocky
@@ -1292,8 +1383,7 @@ public class GameGUI extends GUIScreen {
 
 	@Override
 	public void mousePressed(int x, int y, int button) {
-		this.mx = x;
-		this.my = y;
+		mouseMoved(x, y);
 		if (button != MouseEvent.BUTTON1) {
 			return;
 		}
@@ -1327,7 +1417,7 @@ public class GameGUI extends GUIScreen {
 		}
 
 		/* enter full scale declaration mode */
-		p.pi.sendDecStart(new Declaration(p.id, suitselection));
+		p.declare(suitselection);
 	}
 
 	private void clickWaitForQuestion() {
