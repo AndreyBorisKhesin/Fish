@@ -430,7 +430,7 @@ public class GameGUI extends GUIScreen {
 			}
 		}
 		g.setColor(Color.BLACK);
-		g.setFont(Resources.GAME_FONT.deriveFont(20f));
+		g.setFont(Resources.font(30f));
 		FontMetrics fm = g.getFontMetrics();
 
 		g.drawString("Tricks: ", 5, fm.getHeight());
@@ -448,8 +448,12 @@ public class GameGUI extends GUIScreen {
 					img = Resources.SUIT_TILES_BLU.get(i);
 					break;
 				}
-				g.drawImage(img, x + (i / 2) * img.getWidth(), y
-						+ (i % 2) * (img.getHeight() + 4), null);
+				g.drawImage(img,
+						x + (i / 2) * img.getWidth(),
+						y
+								+ (i % 2)
+								* (img.getHeight() + 4),
+						null);
 			}
 		}
 	}
@@ -497,7 +501,7 @@ public class GameGUI extends GUIScreen {
 			 * this must be before the cards so that transferring
 			 * cards do not slide underneath it
 			 */
-			g.setFont(Resources.GAME_FONT.deriveFont(40f));
+			g.setFont(Resources.font(40f));
 			FontMetrics fm = g.getFontMetrics();
 			g.setColor(Color.BLACK);
 			g.drawString(p.name, gw / 2 - handwidth / 2, h
@@ -570,7 +574,7 @@ public class GameGUI extends GUIScreen {
 			}
 			/* draw the name of the player */
 			{
-				g.setFont(Resources.GAME_FONT.deriveFont(10f));
+				g.setFont(Resources.font(10f));
 				g.setColor(Color.BLACK);
 				FontMetrics fm = g.getFontMetrics();
 
@@ -666,7 +670,7 @@ public class GameGUI extends GUIScreen {
 		String s = "Select a player to ask";
 
 		g.setColor(Color.BLACK);
-		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		g.setFont(Resources.font(30f));
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(s, (int) (0.5 * gw - fm.stringWidth(s) / 2),
 				(int) (0.5 * h + fm.getAscent() / 2));
@@ -689,7 +693,7 @@ public class GameGUI extends GUIScreen {
 		String s = "Select a half suit to ask for";
 
 		g.setColor(Color.BLACK);
-		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		g.setFont(Resources.font(30));
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(s,
 				(int) (0.5 * gw - fm.stringWidth(s) / 2),
@@ -722,7 +726,7 @@ public class GameGUI extends GUIScreen {
 		String s = "Select a rank to ask for";
 
 		g.setColor(Color.BLACK);
-		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		g.setFont(Resources.font(30));
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(s,
 				(int) (0.5 * gw - fm.stringWidth(s) / 2),
@@ -847,7 +851,7 @@ public class GameGUI extends GUIScreen {
 		/* now draw inside the box */
 
 		float qscale = 1.5f;
-		g.setFont(Resources.GAME_FONT.deriveFont(135f * qscale));
+		g.setFont(Resources.font(135f * qscale));
 		FontMetrics fm0 = g.getFontMetrics();
 		g.drawString("?", width - fm0.stringWidth("?") - 5, height / 2
 				+ fm0.getAscent() / 2);
@@ -859,7 +863,7 @@ public class GameGUI extends GUIScreen {
 						* qscale - 10),
 				(int) (height / 2 - 96 * qscale / 2), null);
 
-		g.setFont(Resources.GAME_FONT.deriveFont(30f));
+		g.setFont(Resources.font(30f));
 		FontMetrics fm1 = g.getFontMetrics();
 		String uname = p.others.get(question.dest).uname;
 		g.drawString(uname, (int) (width - fm0.stringWidth("?") - 71
@@ -1016,7 +1020,7 @@ public class GameGUI extends GUIScreen {
 		/* now draw inside the box */
 
 		float qscale = 0.6f;
-		g.setFont(Resources.GAME_FONT.deriveFont(135f * qscale));
+		g.setFont(Resources.font(135f * qscale));
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString("No", width / 2 - fm.stringWidth("No") / 2, height
 				/ 2 + fm.getAscent() / 2);
@@ -1044,7 +1048,7 @@ public class GameGUI extends GUIScreen {
 				: Resources.CARD_BACKS_GRAY).get(t);
 		g.drawImage(img, AffineTransform.getScaleInstance(10, 10), null);
 
-		Font f = Resources.GAME_FONT.deriveFont(40f);
+		Font f = Resources.font(40f);
 		/* translate by the font size */
 		FontMetrics fm = g.getFontMetrics(f);
 

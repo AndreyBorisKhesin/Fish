@@ -28,7 +28,7 @@ public class LocalGameSetup extends GUIScreen {
 				new String[] { "4", "6", "8", "12" },
 				this::setSelection);
 		start = new Button(490, 600, 300, 100, "START",
-				Resources.MENU_OPTION_FONT, this::startGame);
+				Resources.font(45), this::startGame);
 		elements = new UIElement[] { numAI, start };
 
 		this.gui = gui;

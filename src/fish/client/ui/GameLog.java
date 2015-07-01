@@ -28,7 +28,7 @@ public class GameLog {
 		buf = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		bufg = buf.createGraphics();
 		bufg.setBackground(new Color(0, 0, 0, 0));
-		f = Resources.GAME_FONT.deriveFont(15f);
+		f = Resources.font(15);
 		bufg.setFont(f);
 		fm = bufg.getFontMetrics();
 		spaceWidth = fm.stringWidth(" ");

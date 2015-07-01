@@ -18,6 +18,6 @@ public class MainMenuButton extends Button {
 	 * @param clicked The action to perform when clicked
 	 */
 	public MainMenuButton(int x, int y, String s, UIClick action) {
-		super(x, y, 295, 150, s, Resources.MENU_OPTION_FONT, action);
+		super(x, y, 295, 150, s, Resources.font(45), action);
 	}
 }

@@ -91,7 +91,7 @@ public class RadioButton implements UIElement {
 	@Override
 	public void draw(Graphics g) {
 		/* draw the circles and names */
-		g.setFont(Resources.RADIO_BUTTON_FONT);
+		g.setFont(Resources.font(25));
 		FontMetrics fm = g.getFontMetrics();
 		g.drawString(title, xp, yp - 5);
 		for (int i = 0; i < buttons.length; i++) {

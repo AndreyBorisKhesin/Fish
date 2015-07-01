@@ -49,7 +49,7 @@ public class MainMenu extends GUIScreen {
 	public void paintFrame(Graphics2D g, int w, int h) {
 		/* draw the title */
 		{
-			g.setFont(Resources.MENU_FONT);
+			g.setFont(Resources.font(200));
 			FontMetrics fm = g.getFontMetrics();
 			String F = "F";
 			String I = "I";

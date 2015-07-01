@@ -43,13 +43,7 @@ public class Resources {
 		SUIT_TILES_BLU = new HashMap<Integer, BufferedImage>();
 	}
 
-	private static final String FONT_LOC = "resources/gecko.ttf";
-	public static final Font MENU_FONT = UIUtil.loadFont(FONT_LOC)
-			.deriveFont(200f);
-	public static final Font MENU_OPTION_FONT = MENU_FONT.deriveFont(45f);
-	public static final Font RADIO_BUTTON_FONT = MENU_FONT.deriveFont(25f);
-
-	public static final Font GAME_FONT = MENU_FONT.deriveFont(20f);
+	public static final Font GAME_FONT = UIUtil.loadFont("resources/gecko.ttf");
 
 	public static final Color GLOW = new Color(255, 215, 0);
 
@@ -111,6 +105,10 @@ public class Resources {
 	public static BufferedImage scaleImage(BufferedImage img, double scale) {
 		return new AffineTransformOp(AffineTransform.getScaleInstance(
 				scale, scale), null).filter(img, null);
+	}
+
+	public static Font font(float f) {
+		return GAME_FONT.deriveFont(f);
 	}
 
 }
