@@ -27,12 +27,20 @@ public class Resources {
 	public static final Map<Integer, BufferedImage> SUIT_CARDS;
 	public static final Map<Integer, BufferedImage> SUIT_CARDS_GRAY;
 
+	public static final Map<Integer, BufferedImage> SUIT_TILES;
+	public static final Map<Integer, BufferedImage> SUIT_TILES_RED;
+	public static final Map<Integer, BufferedImage> SUIT_TILES_BLU;
+
 	static {
 		CARD_IMGS = new HashMap<Card, BufferedImage>();
 		CARD_BACKS = new HashMap<Team, BufferedImage>();
 		CARD_BACKS_GRAY = new HashMap<Team, BufferedImage>();
 		SUIT_CARDS = new HashMap<Integer, BufferedImage>();
 		SUIT_CARDS_GRAY = new HashMap<Integer, BufferedImage>();
+
+		SUIT_TILES = new HashMap<Integer, BufferedImage>();
+		SUIT_TILES_RED = new HashMap<Integer, BufferedImage>();
+		SUIT_TILES_BLU = new HashMap<Integer, BufferedImage>();
 	}
 
 	private static final String FONT_LOC = "resources/gecko.ttf";
@@ -62,6 +70,11 @@ public class Resources {
 		RescaleOp grayOp = new RescaleOp(new float[] { s, s, s, 1 },
 				new float[] { o, o, o, 0 }, null);
 
+		RescaleOp redOp = new RescaleOp(new float[] { 0, 0, 0, 1 },
+				new float[] { 256f, 0, 0, 0 }, null);
+		RescaleOp blueOp = new RescaleOp(new float[] { 0, 0, 0, 1 },
+				new float[] { 0, 0, 256f, 0 }, null);
+
 		CARD_BACKS.put(Team.BLU,
 				UIUtil.loadImage("resources/cards/bb.png"));
 		CARD_BACKS.put(Team.RED,
@@ -77,6 +90,14 @@ public class Resources {
 					i % 2 == 0 ? 0 : 5)));
 			SUIT_CARDS_GRAY.put(i,
 					grayOp.filter(SUIT_CARDS.get(i), null));
+
+			SUIT_TILES.put(i,
+					UIUtil.loadImage("resources/halfsuits/"
+							+ i + ".png"));
+			SUIT_TILES_RED.put(i,
+					redOp.filter(SUIT_TILES.get(i), null));
+			SUIT_TILES_BLU.put(i,
+					blueOp.filter(SUIT_TILES.get(i), null));
 		}
 	}
 

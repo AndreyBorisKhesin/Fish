@@ -1,7 +1,5 @@
 package fish.client;
 
-import java.util.List;
-
 import fish.client.ui.FishGUI;
 import fish.client.ui.Resources;
 import fish.client.ui.screens.GameGUI;
@@ -10,7 +8,6 @@ import fish.client.ui.screens.LocalGameSetup;
 import fish.client.ui.screens.MainMenu;
 import fish.players.DummyHuman;
 import fish.players.Human;
-import fish.players.Player;
 import fish.server.Server;
 import fish.server.messages.MStartGame;
 import fish.server.messages.SMConnection;
@@ -34,7 +31,6 @@ public class ClientMaster {
 
 	/* unused if connecting to a non-local game */
 	private Server server;
-	private List<Player> ais;
 
 	public ClientMaster() {
 		g = new FishGUI();

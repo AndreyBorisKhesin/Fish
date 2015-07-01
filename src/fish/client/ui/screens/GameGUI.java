@@ -21,6 +21,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntToDoubleFunction;
 
@@ -32,6 +33,7 @@ import fish.client.ui.GameLog;
 import fish.client.ui.Resources;
 import fish.players.Human;
 import fish.server.OtherPlayerData;
+import fish.server.ServerUtil;
 
 public class GameGUI extends GUIScreen {
 
@@ -387,6 +389,7 @@ public class GameGUI extends GUIScreen {
 
 		drawSidebarBorder(g);
 		drawLog(g);
+		drawTricks(g);
 
 		g.setTransform(new AffineTransform());
 	}
@@ -410,6 +413,45 @@ public class GameGUI extends GUIScreen {
 		g.drawLine(0, h - glog.h, sw, h - glog.h);
 
 		g.setStroke(s);
+	}
+
+	private void drawTricks(Graphics2D g) {
+		p.tricks = new HashMap<Integer, Team>();
+		for (int i = 0; i < 8; i++) {
+			switch (ServerUtil.rand.nextInt(3)) {
+			case 0:
+				break;
+			case 1:
+				p.tricks.put(i, Team.BLU);
+				break;
+			case 2:
+				p.tricks.put(i, Team.RED);
+				break;
+			}
+		}
+		g.setColor(Color.BLACK);
+		g.setFont(Resources.GAME_FONT.deriveFont(20f));
+		FontMetrics fm = g.getFontMetrics();
+
+		g.drawString("Tricks: ", 5, fm.getHeight());
+
+		int y = fm.getHeight() + 5;
+		int x = 5;
+		for (int i = 0; i < 8; i++) {
+			if (p.tricks.get(i) != null) {
+				BufferedImage img = null;
+				switch (p.tricks.get(i)) {
+				case RED:
+					img = Resources.SUIT_TILES_RED.get(i);
+					break;
+				case BLU:
+					img = Resources.SUIT_TILES_BLU.get(i);
+					break;
+				}
+				g.drawImage(img, x + (i / 2) * img.getWidth(), y
+						+ (i % 2) * (img.getHeight() + 4), null);
+			}
+		}
 	}
 
 	/**
