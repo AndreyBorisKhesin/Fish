@@ -22,7 +22,7 @@ public class AI extends Player {
 	private Question ask() {
 		q = null;
 		//certain cards
-		l: for (int i = 0; i < hands.length; i++) {
+		for (int i = 0; i < hands.length; i++) {
 			if (i == id || others.get(i).t == this.team) {
 				continue;
 			}
@@ -40,8 +40,7 @@ public class AI extends Player {
 				continue;
 			}
 			for (int j = 0; j < 48; j++) {
-				if (hands[i].get(j) > max &&
-						hand.getSuit(j / 6).size() > 0) {
+				if (hands[i].get(j) >= max && hand.getSuit(j / 6).size() > 0) {
 					max = hands[i].get(j);
 					q = new Question(id, i, new Card(j));
 				}
@@ -74,7 +73,7 @@ public class AI extends Player {
 			for (QuantumHand hand : hands) {
 				hand.zero(q.c);
 			}
-			hands[q.dest].fix(q.c);
+			hands[q.source].fix(q.c);
 		} else {
 			hands[q.source].zero(q.c);// TODO FIXME FIXME FIXME
 			// FIXME battles and bluffing
@@ -143,35 +142,33 @@ public class AI extends Player {
 		//rebalances matrices
 		//refills quantum hands
 		//fixes certain cards
-		boolean b;
-		do {
-			b = false;
-			Matrix matrix = new Matrix(array);
-			for (int i = 0; i < 20; i++) {
-				matrix = matrix.diagonalReciprocal(matrix.sum(), units);
-				matrix = matrix.t().diagonalReciprocal(matrix.t().sum()).t();
-			}
-			for (int i = 0; i < hands.length; i++) {
-				for (int j = 0; j < 9; j++) {
-					hands[i].getQuantumHand()[j].clear();
-					for (int k = 0; k < 48; k++) {
-						if (j == 8 != hands[i].getMoved()[new Card(k).suit] &&
-								!isZero(matrix.m[9 * i + j][k])) {
-							hands[i].getQuantumHand()[j].put
-									(new Card(k), matrix.m[9 * i + j][k]);
-						}
+		Matrix matrix = new Matrix(array);
+		for (int i = 0; i < 20; i++) {
+			matrix = matrix.diagonalReciprocal(matrix.sum(), units);
+			matrix = matrix.t().diagonalReciprocal(matrix.t().sum()).t();
+		}
+		for (int i = 0; i < hands.length; i++) {
+			for (int j = 0; j < 9; j++) {
+				hands[i].getQuantumHand()[j].clear();
+				for (int k = 0; k < 48; k++) {
+					if (j == 8 != hands[i].getMoved()[new Card(k).suit] &&
+							!isZero(matrix.m[9 * i + j][k])) {
+						hands[i].getQuantumHand()[j].put
+								(new Card(k), matrix.m[9 * i + j][k]);
 					}
 				}
 			}
-			for (int i = 0; i < hands.length; i++) {
-				for (Card c : hands[i].check()) {
-					b = true;
-					for (int j = 0; j < hands.length; j++) {
-						hands[j].zero(c);
-					}
-				}
-			}
-		} while (b);
+		}
+		for (QuantumHand quantumHand : hands) {
+			quantumHand.check();
+		}
+//		for (int i = 0; i < hands.length; i++) {
+//			for (Card c : hands[i].check()) {
+//				for (int j = 0; j < hands.length; j++) {
+//					hands[j].zero(c);
+//				}
+//			}
+//		}
 	}
 
 	@Override
@@ -180,6 +177,12 @@ public class AI extends Player {
 		super.updateGameState(p, others, tricks, turn, dec);
 		if (this.hands == null) {
 			instantiate(others.size());
+		}
+		for (Card c : hand.getCards()) {
+			hands[id].fix(c);
+		}
+		for (int i = 0; i < 9; i++) {
+			hands[id].getQuantumHand()[i].clear();
 		}
 		//decides on a question
 		if (this.id == this.turn) {

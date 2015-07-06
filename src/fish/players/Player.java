@@ -13,7 +13,7 @@ import fish.server.PlayerState;
 import fish.server.playerinterface.PlayerInterface;
 
 /**
- * An interface for all Humans and AI's playing the game.
+ * An interface for all Humans and AIs playing the game.
  */
 public abstract class Player {
 	public Hand hand;

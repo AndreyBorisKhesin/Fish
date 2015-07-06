@@ -85,12 +85,12 @@ public class QuantumHand {
 			if (c.suit == 8) {
 				genericCardNum--;
 			} else {
-				bounds[c.suit][0]--;
+				bounds[c.suit][0] = Math.max(0, bounds[c.suit][0] - 1);
 				bounds[c.suit][1]--;
 			}
 		}
-		hand.add(c);
 		zero(c);
+		hand.add(c);
 	}
 
 	public void fix(int i) {
@@ -123,6 +123,13 @@ public class QuantumHand {
 	 * Updates and re-balances the QuantumHand.
 	 */
 	public void move(int suit) {
+		for (int i = 0; i < quantumHand.length; i++) {
+			for (Card c : quantumHand[i].keySet()) {
+				if (isZero(this.get(c))) {
+					quantumHand[suit(c)].remove(c);
+				}
+			}
+		}
 		if (!moved[suit]) {
 			int pos = 0;
 			for (Card c : quantumHand[8].keySet()) {
@@ -145,6 +152,7 @@ public class QuantumHand {
 	}
 
 	public void zero(Card c) {
+		hand.remove(c);
 		quantumHand[suit(c)].remove(c);
 	}
 
