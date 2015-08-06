@@ -38,7 +38,7 @@ public final class Matrix {
 		for (int i = 0; i < m.length; i++) {
 			for (int j = 0; j < m[0].length; j++) {
 				if (isZero(m[i][j] - 1)) {
-					m[i][j] = vector[j] / units[j];
+						m[i][j] = vector[j] / units[j];
 				}
 			}
 		}

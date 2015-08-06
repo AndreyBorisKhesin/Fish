@@ -6,6 +6,7 @@ import fish.*;
 import fish.server.OtherPlayerData;
 import fish.server.PlayerState;
 
+import static fish.Util.inTol;
 import static fish.Util.isZero;
 
 public class AI extends Player {
@@ -39,14 +40,34 @@ public class AI extends Player {
 			if (i == id || others.get(i).t == this.team) {
 				continue;
 			}
-			for (int j = 0; j < 48; j++) {
-				if (hands[i].get(j) >= max && hand.getSuit(j / 6).size() > 0) {
-					max = hands[i].get(j);
-					q = new Question(id, i, new Card(j));
+			for (int j = 0; j < 8; j++) {
+				if (hand.getSuit(j).size() == 0) {
+					continue;
+				}
+				for (int k = 0; k < 6; k++) {
+					if (hands[i].get(j * 6 + k) >= max) {
+						max = hands[i].get(j * 6 + k);
+					}
 				}
 			}
 		}
-		return q;
+		List<Question> choices = new ArrayList<>();
+		for (int i = 0; i < hands.length; i++) {
+			if (i == id || others.get(i).t == this.team) {
+				continue;
+			}
+			for (int j = 0; j < 8; j++) {
+				if (hand.getSuit(j).size() == 0) {
+					continue;
+				}
+				for (int k = 0; k < 6; k++) {
+					if (inTol(hands[i].get(j * 6 + k), max)) {
+						choices.add(new Question(id, i, new Card(j, k)));
+					}
+				}
+			}
+		}
+		return choices.get((int) (Math.random() * choices.size()));
 	}
 
 	private void instantiate(int numPlayers) {
