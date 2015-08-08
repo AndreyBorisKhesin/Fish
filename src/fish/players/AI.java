@@ -21,10 +21,9 @@ public class AI extends Player {
 	}
 
 	private Question ask() {
-		q = null;
 		//certain cards
 		for (int i = 0; i < hands.length; i++) {
-			if (i == id || others.get(i).t == this.team) {
+			if (others.get(i).t == this.team) {
 				continue;
 			}
 			for (Card c : hands[i].getHand().getCards()) {
@@ -37,7 +36,7 @@ public class AI extends Player {
 		// FIXME battles and bluffing
 		double max = 0;
 		for (int i = 0; i < hands.length; i++) {
-			if (i == id || others.get(i).t == this.team) {
+			if (others.get(i).t == this.team) {
 				continue;
 			}
 			for (int j = 0; j < 8; j++) {
@@ -53,7 +52,7 @@ public class AI extends Player {
 		}
 		List<Question> choices = new ArrayList<>();
 		for (int i = 0; i < hands.length; i++) {
-			if (i == id || others.get(i).t == this.team) {
+			if (others.get(i).t == this.team) {
 				continue;
 			}
 			for (int j = 0; j < 8; j++) {
@@ -66,6 +65,9 @@ public class AI extends Player {
 					}
 				}
 			}
+		}
+		if (choices.size() == 0) {
+			int k = 0;
 		}
 		return choices.get((int) (Math.random() * choices.size()));
 	}
@@ -135,20 +137,19 @@ public class AI extends Player {
 		for (int i = 0; i < hands.length; i++) {
 			for (int j = 0; j < 9; j++) {
 				for (int k = 0; k < 48; k++) {
-					array[9 * i + j][k] = hands[i].get(k);
+					array[i * 9 + j][k] = hands[i].get(k);
 				}
 				if (j == 8) {
-					units[9 * i + j] = hands[i].getGenericCardNum();
+					units[i * 9 + j] = hands[i].getGenericCardNum();
 				} else if (hands[i].getMoved()[j]) {
-					units[9 * i + j] = hands[i].getBounds()[j][0];
+					units[i * 9 + j] = hands[i].getBounds()[j][0];
 				} else {
-					units[9 * i + j] = 0;
+					units[i * 9 + j] = 0;
 				}
 			}
 		}
 		//counts cards you know
 		Set<Card> known = new HashSet<>();
-		known.addAll(hand.getCards());
 		for (QuantumHand hand : hands) {
 			known.addAll(hand.getHand().getCards());
 		}
@@ -173,9 +174,9 @@ public class AI extends Player {
 				hands[i].getQuantumHand()[j].clear();
 				for (int k = 0; k < 48; k++) {
 					if (j == 8 != hands[i].getMoved()[new Card(k).suit] &&
-							!isZero(matrix.m[9 * i + j][k])) {
+							!isZero(matrix.m[i * 9 + j][k])) {
 						hands[i].getQuantumHand()[j].put
-								(new Card(k), matrix.m[9 * i + j][k]);
+								(new Card(k), matrix.m[i * 9 + j][k]);
 					}
 				}
 			}

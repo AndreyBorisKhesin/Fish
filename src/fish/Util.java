@@ -23,14 +23,14 @@ public final class Util {
 	 */
 	public static final Double EPS = 1e-9;
 
-	public static final Double TOL = 5e-2;
+	public static final Double TOL = 0.1;
 
 	public static boolean isZero(double d) {
 		return Math.abs(d) < EPS;
 	}
 
 	public static boolean inTol(double a, double b) {
-		return Math.max(a, b) / Math.min(a, b) - 1 < TOL;
+		return Math.max(a, b) / Math.min(a, b) < 1 + TOL;
 	}
 
 	/**

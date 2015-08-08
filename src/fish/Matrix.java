@@ -38,7 +38,7 @@ public final class Matrix {
 		for (int i = 0; i < m.length; i++) {
 			for (int j = 0; j < m[0].length; j++) {
 				if (isZero(m[i][j] - 1)) {
-						m[i][j] = vector[j] / units[j];
+						m[i][j] = vector[i] / units[i];
 				}
 			}
 		}
@@ -61,9 +61,9 @@ public final class Matrix {
 	public double[] sum() {
 		double[] sum = new double[m.length];
 		for (int i = 0; i < sum.length; i++) {
-			//sum[i] = Arrays.stream(m[i]).filter(x -> !isZero(x - 1)).sum();
+			sum[i] = Arrays.stream(m[i]).filter(x -> !isZero(x - 1)).sum();
 			//the above is to be uncommented if the line below break the game
-			sum[i] = Arrays.stream(m[i]).sum();
+			//sum[i] = Arrays.stream(m[i]).sum();
 		}
 		return sum;
 	}
