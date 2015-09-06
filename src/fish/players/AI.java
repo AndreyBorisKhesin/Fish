@@ -50,6 +50,21 @@ public class AI extends Player {
 				}
 			}
 		}
+		if (isZero(max)) {
+			int s;
+			do {
+				s = (int) (Math.random() * 8);
+			} while (hand.getSuit(s).size() == 0);
+			int r;
+			do {
+				r = (int) (Math.random() * 6);
+			} while (hand.contains(new Card(s, r)));
+			int t;
+			do {
+				t = (int) (Math.random() * hands.length);
+			} while (others.get(t).t == team);
+			return new Question(id, t, new Card(s, r));
+		}
 		List<Question> choices = new ArrayList<>();
 		for (int i = 0; i < hands.length; i++) {
 			if (others.get(i).t == this.team) {
